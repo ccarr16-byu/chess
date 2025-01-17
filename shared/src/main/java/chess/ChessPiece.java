@@ -54,4 +54,62 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public int hashCode() {
+        int color;
+        int pieceNum;
+
+        if (this.pieceColor == ChessGame.TeamColor.WHITE) {
+            color = 1;
+        } else {
+            color = 0;
+        }
+
+        switch (this.type) {
+            case KING:
+                pieceNum = 1;
+                break;
+            case QUEEN:
+                pieceNum = 2;
+                break;
+            case ROOK:
+                pieceNum = 3;
+                break;
+            case BISHOP:
+                pieceNum = 4;
+                break;
+            case KNIGHT:
+                pieceNum = 5;
+                break;
+            case PAWN:
+                pieceNum = 6;
+                break;
+            default:
+                pieceNum = 0;
+        }
+
+        return (pieceNum * 10) + color;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        ChessPiece obj2 = (ChessPiece)obj;
+        if (this.hashCode() == obj2.hashCode()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s",this.pieceColor.name(), this.type.name());
+    }
 }
