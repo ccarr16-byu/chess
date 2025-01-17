@@ -82,7 +82,7 @@ public class ChessMove {
             return false;
         }
         ChessMove obj2 = (ChessMove)obj;
-        if (this.getStartPosition() == obj2.getStartPosition() && this.getEndPosition() == obj2.getEndPosition() && this.getPromotionPiece() == obj2.getPromotionPiece()) {
+        if (this.hashCode() == obj2.hashCode()) {
             return true;
         } else {
             return false;
