@@ -8,22 +8,29 @@ package chess;
  */
 public class ChessMove {
 
+    private ChessPosition startPosition;
+    private ChessPosition endPosition;
+    private ChessPiece.PieceType promotionPiece;
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.promotionPiece = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        throw new RuntimeException("Not implemented");
+        return this.startPosition;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        throw new RuntimeException("Not implemented");
+        return this.endPosition;
     }
 
     /**
@@ -33,12 +40,37 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        throw new RuntimeException("Not implemented");
+        if (this.promotionPiece == null) {
+            return null;
+        } else {
+            return this.promotionPiece;
+        }
     }
 
     @Override
     public int hashCode() {
-        return (this.getStartPosition().getRow() * 1000) + (this.getStartPosition().getColumn() * 100) + (this.getEndPosition().getRow() * 10) + this.getEndPosition().getColumn();
+        int pieceNum;
+        if (this.promotionPiece == null) {
+            pieceNum = 0;
+        } else {
+            switch (this.promotionPiece) {
+                case QUEEN:
+                    pieceNum = 1;
+                    break;
+                case ROOK:
+                    pieceNum = 2;
+                    break;
+                case BISHOP:
+                    pieceNum = 3;
+                    break;
+                case KNIGHT:
+                    pieceNum = 4;
+                    break;
+                default:
+                    pieceNum = 0;
+            }
+        }
+        return (this.getStartPosition().getRow() * 10000) + (this.getStartPosition().getColumn() * 1000) + (this.getEndPosition().getRow() * 100) + (this.getEndPosition().getColumn() * 10) + pieceNum;
     }
 
     @Override
