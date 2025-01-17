@@ -35,4 +35,25 @@ public class ChessMove {
     public ChessPiece.PieceType getPromotionPiece() {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public int hashCode() {
+        return (this.getStartPosition().getRow() * 1000) + (this.getStartPosition().getColumn() * 100) + (this.getEndPosition().getRow() * 10) + this.getEndPosition().getColumn();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        ChessMove obj2 = (ChessMove)obj;
+        if (this.getStartPosition() == obj2.getStartPosition() && this.getEndPosition() == obj2.getEndPosition() && this.getPromotionPiece() == obj2.getPromotionPiece()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
