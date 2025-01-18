@@ -48,6 +48,111 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        for (ChessPosition square : boardState.keySet()) {
+            boardState.put(square, null);
+        }
+
+        for (int i = 1; i < 9; i++) {
+            ChessPosition square = new ChessPosition(2, i);
+            ChessPiece piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            boardState.put(square, piece);
+
+            square = new ChessPosition(7, i);
+            piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            boardState.put(square, piece);
+        }
+
+        ChessPosition square = new ChessPosition(1, 5);
+        ChessPiece piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 5);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 4);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 4);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 3);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 3);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 6);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 6);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 2);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 2);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 7);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 7);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 1);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 1);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(1, 8);
+        piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        boardState.put(square, piece);
+
+        square = new ChessPosition(8, 8);
+        piece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        boardState.put(square, piece);
+    }
+
+    @Override
+    public int hashCode() {
+        int code = 0;
+        for (ChessPosition checkSquare : boardState.keySet()) {
+            if (boardState.get(checkSquare) == null) {
+                code += (checkSquare.hashCode() * checkSquare.hashCode());
+            } else {
+                code += (boardState.get(checkSquare).hashCode() * (checkSquare.hashCode()) * checkSquare.hashCode());
+            }
+        }
+        return code;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+        ChessBoard obj2 = (ChessBoard)obj;
+        if (obj2.hashCode() == this.hashCode()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
