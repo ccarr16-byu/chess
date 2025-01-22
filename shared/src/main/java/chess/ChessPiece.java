@@ -71,6 +71,9 @@ public class ChessPiece {
             case ROOK:
                 moves = new ArrayList<>(new RookMovesCalculator().pieceMoves(board, myPosition));
                 return moves;
+            case BISHOP:
+                moves = new ArrayList<>(new BishopMovesCalculator().pieceMoves(board, myPosition));
+                return moves;
             default:
                 moves = null;
                 break;
