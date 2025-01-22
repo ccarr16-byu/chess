@@ -6,7 +6,7 @@ import java.util.List;
 public class PawnMovesCalculator implements PieceMovesCalculator {
     @Override
     public List<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        List<ChessMove> moves = new ArrayList<ChessMove>();
+        List<ChessMove> moves = new ArrayList<>();
         if (board.getPiece(position) == null) {
             return moves;
         }

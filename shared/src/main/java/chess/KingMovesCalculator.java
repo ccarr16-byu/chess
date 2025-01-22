@@ -6,7 +6,7 @@ import java.util.List;
 public class KingMovesCalculator implements PieceMovesCalculator {
     @Override
     public List<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
-        List<ChessMove> moves = new ArrayList<ChessMove>();
+        List<ChessMove> moves = new ArrayList<>();
         int currentColumn = position.getColumn();
         int currentRow = position.getRow();
         if (board.getPiece(position) == null) {

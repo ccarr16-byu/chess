@@ -68,6 +68,9 @@ public class ChessPiece {
             case KNIGHT:
                 moves = new ArrayList<>(new KnightMovesCalculator().pieceMoves(board, myPosition));
                 return moves;
+            case ROOK:
+                moves = new ArrayList<>(new RookMovesCalculator().pieceMoves(board, myPosition));
+                return moves;
             default:
                 moves = null;
                 break;
