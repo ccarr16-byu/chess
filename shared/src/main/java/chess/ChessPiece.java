@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -55,7 +57,16 @@ public class ChessPiece {
         if (board.getPiece(myPosition) == null) {
             return null;
         }
-        return null;
+        List<ChessMove> moves;
+        switch (board.getPiece(myPosition).getPieceType()) {
+            case PAWN:
+                moves = new ArrayList<>(new PawnMovesCalculator().pieceMoves(board, myPosition));
+                return moves;
+            default:
+                moves = null;
+                break;
+        }
+        return moves;
     }
 
     @Override
