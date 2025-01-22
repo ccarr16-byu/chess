@@ -53,26 +53,29 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        if (board.getPiece(myPosition) == null) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+        if (board.getPiece(position) == null) {
             return null;
         }
         List<ChessMove> moves;
-        switch (board.getPiece(myPosition).getPieceType()) {
+        switch (board.getPiece(position).getPieceType()) {
             case PAWN:
-                moves = new ArrayList<>(new PawnMovesCalculator().pieceMoves(board, myPosition));
+                moves = new ArrayList<>(new PawnMovesCalculator().pieceMoves(board, position));
                 return moves;
             case KING:
-                moves = new ArrayList<>(new KingMovesCalculator().pieceMoves(board, myPosition));
+                moves = new ArrayList<>(new KingMovesCalculator().pieceMoves(board, position));
                 return moves;
             case KNIGHT:
-                moves = new ArrayList<>(new KnightMovesCalculator().pieceMoves(board, myPosition));
+                moves = new ArrayList<>(new KnightMovesCalculator().pieceMoves(board, position));
                 return moves;
             case ROOK:
-                moves = new ArrayList<>(new RookMovesCalculator().pieceMoves(board, myPosition));
+                moves = new ArrayList<>(new RookMovesCalculator().pieceMoves(board, position));
                 return moves;
             case BISHOP:
-                moves = new ArrayList<>(new BishopMovesCalculator().pieceMoves(board, myPosition));
+                moves = new ArrayList<>(new BishopMovesCalculator().pieceMoves(board, position));
+                return moves;
+            case QUEEN:
+                moves = new ArrayList<>(new QueenMovesCalculator().pieceMoves(board, position));
                 return moves;
             default:
                 moves = null;
