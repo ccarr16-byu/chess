@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor pieceColor;
-    private ChessPiece.PieceType type;
+    private final ChessGame.TeamColor pieceColor;
+    private final ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -78,8 +78,7 @@ public class ChessPiece {
                 moves = new ArrayList<>(new QueenMovesCalculator().pieceMoves(board, position));
                 return moves;
             default:
-                moves = null;
-                break;
+                moves = new ArrayList<>();
         }
         return moves;
     }
@@ -95,28 +94,14 @@ public class ChessPiece {
             color = 0;
         }
 
-        switch (this.type) {
-            case KING:
-                pieceNum = 1;
-                break;
-            case QUEEN:
-                pieceNum = 2;
-                break;
-            case ROOK:
-                pieceNum = 3;
-                break;
-            case BISHOP:
-                pieceNum = 4;
-                break;
-            case KNIGHT:
-                pieceNum = 5;
-                break;
-            case PAWN:
-                pieceNum = 6;
-                break;
-            default:
-                pieceNum = 0;
-        }
+        pieceNum = switch (this.type) {
+            case KING -> 1;
+            case QUEEN -> 2;
+            case ROOK -> 3;
+            case BISHOP -> 4;
+            case KNIGHT -> 5;
+            case PAWN -> 6;
+        };
 
         return (pieceNum * 10) + color;
     }
@@ -130,11 +115,7 @@ public class ChessPiece {
             return false;
         }
         ChessPiece obj2 = (ChessPiece)obj;
-        if (this.hashCode() == obj2.hashCode()) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.hashCode() == obj2.hashCode();
     }
 
     @Override

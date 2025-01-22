@@ -10,7 +10,7 @@ import java.lang.Math;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] board = new ChessPiece[8][8];
+    private final ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
     }
@@ -146,10 +146,6 @@ public class ChessBoard {
             return false;
         }
         ChessBoard obj2 = (ChessBoard)obj;
-        if (obj2.hashCode() == this.hashCode()) {
-            return true;
-        } else {
-            return false;
-        }
+        return obj2.hashCode() == this.hashCode();
     }
 }

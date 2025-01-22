@@ -8,9 +8,9 @@ package chess;
  */
 public class ChessMove {
 
-    private ChessPosition startPosition;
-    private ChessPosition endPosition;
-    private ChessPiece.PieceType promotionPiece;
+    private final ChessPosition startPosition;
+    private final ChessPosition endPosition;
+    private final ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -40,11 +40,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        if (this.promotionPiece == null) {
-            return null;
-        } else {
-            return this.promotionPiece;
-        }
+        return this.promotionPiece;
     }
 
     @Override
@@ -53,22 +49,13 @@ public class ChessMove {
         if (this.promotionPiece == null) {
             pieceNum = 0;
         } else {
-            switch (this.promotionPiece) {
-                case QUEEN:
-                    pieceNum = 1;
-                    break;
-                case ROOK:
-                    pieceNum = 2;
-                    break;
-                case BISHOP:
-                    pieceNum = 3;
-                    break;
-                case KNIGHT:
-                    pieceNum = 4;
-                    break;
-                default:
-                    pieceNum = 0;
-            }
+            pieceNum = switch (this.promotionPiece) {
+                case QUEEN -> 1;
+                case ROOK -> 2;
+                case BISHOP -> 3;
+                case KNIGHT -> 4;
+                default -> 0;
+            };
         }
         return (this.getStartPosition().getRow() * 10000) + (this.getStartPosition().getColumn() * 1000) + (this.getEndPosition().getRow() * 100) + (this.getEndPosition().getColumn() * 10) + pieceNum;
     }
@@ -82,10 +69,6 @@ public class ChessMove {
             return false;
         }
         ChessMove obj2 = (ChessMove)obj;
-        if (this.hashCode() == obj2.hashCode()) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.hashCode() == obj2.hashCode();
     }
 }

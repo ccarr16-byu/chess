@@ -8,8 +8,8 @@ package chess;
  */
 public class ChessPosition {
 
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
@@ -51,10 +51,6 @@ public class ChessPosition {
             return false;
         }
         ChessPosition obj2 = (ChessPosition)obj;
-        if (obj2.getRow() == this.getRow() && obj2.getColumn() == this.getColumn()) {
-            return true;
-        } else {
-            return false;
-        }
+        return obj2.getRow() == this.getRow() && obj2.getColumn() == this.getColumn();
     }
 }
