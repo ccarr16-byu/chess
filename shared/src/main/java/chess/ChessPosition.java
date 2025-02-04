@@ -16,6 +16,11 @@ public class ChessPosition {
         this.col = col;
     }
 
+    public ChessPosition(ChessPosition copy) {
+        this.row = copy.getRow();
+        this.col = copy.getColumn();
+    }
+
     /**
      * @return which row this position is in
      * 1 codes for the bottom row

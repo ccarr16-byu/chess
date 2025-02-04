@@ -53,7 +53,7 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         if (board.getPiece(position) == null) {
             return null;
         }
