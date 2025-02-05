@@ -85,7 +85,21 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         List<ChessMove> validMoves = new ArrayList<>();
-
+        if (board.getPiece(startPosition) == null) {
+            return validMoves;
+        }
+        if (ChessPiece.pieceMoves(board, startPosition) == null) {
+            return validMoves;
+        }
+        TeamColor color = board.getPiece(startPosition).getTeamColor();
+        for (ChessMove move : ChessPiece.pieceMoves(board, startPosition)) {
+            ChessBoard simulatedBoard = simulateMove(move, board);
+            ChessGame simulatedGame = new ChessGame();
+            simulatedGame.setBoard(simulatedBoard);
+            if (!simulatedGame.isInCheck(color)) {
+                validMoves.add(move);
+            }
+        }
         return validMoves;
     }
 
