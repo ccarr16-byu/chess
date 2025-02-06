@@ -110,6 +110,34 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece piece = board.getPiece(start);
+        if (piece == null) {
+            throw new InvalidMoveException("Invalid move!");
+        }
+        if (piece.getTeamColor() != getTeamTurn()) {
+            throw new InvalidMoveException("Invalid move!");
+        }
+        if (!validMoves(start).contains(move)) {
+            throw new InvalidMoveException("Invalid move!");
+        }
+        if (move.getPromotionPiece() == null) {
+            board.addPiece(end, piece);
+        } else {
+            switch (move.getPromotionPiece()) {
+                case KNIGHT -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.KNIGHT));
+                case BISHOP -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.BISHOP));
+                case ROOK -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.ROOK));
+                case QUEEN -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.QUEEN));
+            }
+        }
+        board.addPiece(start, null);
+        if (teamTurn == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     /**
