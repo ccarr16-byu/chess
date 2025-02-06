@@ -14,16 +14,19 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard board;
+    private CastlingTracker castlingTracker;
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
         teamTurn = TeamColor.WHITE;
+        castlingTracker = new CastlingTracker();
     }
 
     public ChessGame(ChessGame copy) {
         board = new ChessBoard(copy.getBoard());
         teamTurn = copy.getTeamTurn();
+        castlingTracker = new CastlingTracker();
     }
 
     /**
@@ -100,6 +103,9 @@ public class ChessGame {
                 validMoves.add(move);
             }
         }
+        if (board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING) {
+            validMoves.addAll(castlingTracker.possibleCastlingMoves(board, color));
+        }
         return validMoves;
     }
 
@@ -124,6 +130,26 @@ public class ChessGame {
         }
         if (move.getPromotionPiece() == null) {
             board.addPiece(end, piece);
+            board.addPiece(start, null);
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                ChessMove whiteKSCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null);
+                ChessMove whiteQSCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null);
+                ChessMove blackKSCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null);
+                ChessMove blackQSCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null);
+                if (move.equals(whiteKSCastle)) {
+                    board.addPiece(new ChessPosition(1, 6), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(1, 8), null);
+                } else if (move.equals(whiteQSCastle)) {
+                    board.addPiece(new ChessPosition(1, 4), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(1, 1), null);
+                } else if (move.equals(blackKSCastle)) {
+                    board.addPiece(new ChessPosition(8, 6), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(8, 8), null);
+                } else if (move.equals(blackQSCastle)) {
+                    board.addPiece(new ChessPosition(8, 4), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(8, 1), null);
+                }
+            }
         } else {
             switch (move.getPromotionPiece()) {
                 case KNIGHT -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.KNIGHT));
@@ -131,12 +157,25 @@ public class ChessGame {
                 case ROOK -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.ROOK));
                 case QUEEN -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.QUEEN));
             }
+            board.addPiece(start, null);
         }
-        board.addPiece(start, null);
         if (teamTurn == TeamColor.WHITE) {
             setTeamTurn(TeamColor.BLACK);
         } else {
             setTeamTurn(TeamColor.WHITE);
+        }
+        if (start.equals(new ChessPosition(1, 5)) || end.equals(new ChessPosition(1, 5))) {
+            castlingTracker.setWhiteKingMoved(true);
+        } else if (start.equals(new ChessPosition(1, 8)) || end.equals(new ChessPosition(1, 8))) {
+            castlingTracker.setWhiteKSRookMoved(true);
+        } else if (start.equals(new ChessPosition(1, 1)) || end.equals(new ChessPosition(1, 1))) {
+            castlingTracker.setWhiteQSRookMoved(true);
+        } else if (start.equals(new ChessPosition(8, 5)) || end.equals(new ChessPosition(8, 5))) {
+            castlingTracker.setBlackKingMoved(true);
+        } else if (start.equals(new ChessPosition(8, 8)) || end.equals(new ChessPosition(8, 8))) {
+            castlingTracker.setBlackKSRookMoved(true);
+        } else if (start.equals(new ChessPosition(8, 1)) || end.equals(new ChessPosition(8, 1))) {
+            castlingTracker.setBlackQSRookMoved(true);
         }
     }
 
@@ -224,6 +263,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+        castlingTracker = new CastlingTracker();
     }
 
     /**
