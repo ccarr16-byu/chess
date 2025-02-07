@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -15,18 +16,21 @@ public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
     private CastlingTracker castlingTracker;
+    private EnPassantTracker enPassantTracker;
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
         teamTurn = TeamColor.WHITE;
         castlingTracker = new CastlingTracker();
+        enPassantTracker = new EnPassantTracker();
     }
 
     public ChessGame(ChessGame copy) {
         board = new ChessBoard(copy.getBoard());
         teamTurn = copy.getTeamTurn();
         castlingTracker = new CastlingTracker();
+        enPassantTracker = copy.getEnPassantTracker();
     }
 
     /**
@@ -95,7 +99,7 @@ public class ChessGame {
             return validMoves;
         }
         TeamColor color = board.getPiece(startPosition).getTeamColor();
-        for (ChessMove move : ChessPiece.pieceMoves(board, startPosition)) {
+        for (ChessMove move : Objects.requireNonNull(ChessPiece.pieceMoves(board, startPosition))) {
             ChessBoard simulatedBoard = simulateMove(move, board);
             ChessGame simulatedGame = new ChessGame();
             simulatedGame.setBoard(simulatedBoard);
@@ -105,6 +109,11 @@ public class ChessGame {
         }
         if (board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING) {
             validMoves.addAll(castlingTracker.possibleCastlingMoves(board, color));
+        }
+        if (board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
+            if (enPassantTracker.isEnPassantAllowed() && enPassantTracker.getAttackingSquares().contains(startPosition)) {
+                validMoves.add(new ChessMove(startPosition, enPassantTracker.getKillDestination(), null));
+            }
         }
         return validMoves;
     }
@@ -132,6 +141,9 @@ public class ChessGame {
             board.addPiece(end, piece);
             board.addPiece(start, null);
             if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (enPassantTracker.isEnPassantAllowed()) {
+                    enPassantTracker.setEnPassantAllowed();
+                }
                 ChessMove whiteKSCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null);
                 ChessMove whiteQSCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null);
                 ChessMove blackKSCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null);
@@ -149,8 +161,24 @@ public class ChessGame {
                     board.addPiece(new ChessPosition(8, 4), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
                     board.addPiece(new ChessPosition(8, 1), null);
                 }
+            } else if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                if (move.getEndPosition().getRow() == move.getStartPosition().getRow() + 2 || move.getEndPosition().getRow() == move.getStartPosition().getRow() - 2) {
+                    enPassantTracker = new EnPassantTracker(move.getEndPosition(), piece.getTeamColor());
+                } else if (enPassantTracker.isEnPassantAllowed() && enPassantTracker.getKillDestination().equals(move.getEndPosition())) {
+                    board.addPiece(new ChessPosition(enPassantTracker.getVulnerablePawn()), null);
+                    enPassantTracker.setEnPassantAllowed();
+                } else {
+                    enPassantTracker.setEnPassantAllowed();
+                }
+            } else {
+                if (enPassantTracker.isEnPassantAllowed()) {
+                    enPassantTracker.setEnPassantAllowed();
+                }
             }
         } else {
+            if (enPassantTracker.isEnPassantAllowed()) {
+                enPassantTracker.setEnPassantAllowed();
+            }
             switch (move.getPromotionPiece()) {
                 case KNIGHT -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.KNIGHT));
                 case BISHOP -> board.addPiece(end, new ChessPiece(piece.getTeamColor(), ChessPiece.PieceType.BISHOP));
@@ -273,5 +301,9 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    public EnPassantTracker getEnPassantTracker() {
+        return this.enPassantTracker;
     }
 }
