@@ -65,7 +65,7 @@ public class CastlingTracker {
 
     public boolean canKSCastle (ChessBoard board, ChessGame.TeamColor color) {
         if (color == ChessGame.TeamColor.WHITE) {
-            if (!isWhiteKSRookMoved()) {
+            if (!isWhiteKSRookMoved() && board.getPiece(new ChessPosition(1, 8)) != null && board.getPiece(new ChessPosition(1, 8)).equals(new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK))) {
                 ChessPosition wKOrigin = new ChessPosition(1, 5);
                 ChessPosition wKSSquare1 = new ChessPosition(1, 6);
                 ChessPosition wKSSquare2 = new ChessPosition(1, 7);
@@ -84,7 +84,7 @@ public class CastlingTracker {
                 }
             }
         } else {
-            if (!isBlackKSRookMoved()) {
+            if (!isBlackKSRookMoved() && board.getPiece(new ChessPosition(8, 8)) != null && board.getPiece(new ChessPosition(8, 8)).equals(new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK))) {
                 ChessPosition bKOrigin = new ChessPosition(8, 5);
                 ChessPosition bKSSquare1 = new ChessPosition(8, 6);
                 ChessPosition bKSSquare2 = new ChessPosition(8, 7);
@@ -108,7 +108,7 @@ public class CastlingTracker {
 
     public boolean canQSCastle (ChessBoard board, ChessGame.TeamColor color) {
         if (color == ChessGame.TeamColor.WHITE) {
-            if (!isWhiteQSRookMoved()) {
+            if (!isWhiteQSRookMoved() && board.getPiece(new ChessPosition(1, 1)) != null && board.getPiece(new ChessPosition(1, 1)).equals(new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK))) {
                 ChessPosition wKOrigin = new ChessPosition(1, 5);
                 ChessPosition wQSSquare1 = new ChessPosition(1, 4);
                 ChessPosition wQSSquare2 = new ChessPosition(1, 3);
@@ -127,7 +127,7 @@ public class CastlingTracker {
                 }
             }
         } else {
-            if (!isBlackQSRookMoved()) {
+            if (!isBlackQSRookMoved() && board.getPiece(new ChessPosition(8, 1)) != null && board.getPiece(new ChessPosition(8, 1)).equals(new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK))) {
                 ChessPosition bKOrigin = new ChessPosition(8, 5);
                 ChessPosition bQSSquare1 = new ChessPosition(8, 4);
                 ChessPosition bQSSquare2 = new ChessPosition(8, 3);
@@ -152,7 +152,7 @@ public class CastlingTracker {
     public Collection<ChessMove> possibleCastlingMoves(ChessBoard board, ChessGame.TeamColor color) {
         List<ChessMove> possibleCastlingMoves = new ArrayList<>();
         if (color == ChessGame.TeamColor.WHITE) {
-            if (isWhiteKingMoved()) {
+            if (isWhiteKingMoved() || board.getPiece(new ChessPosition(1, 5)) == null || !board.getPiece(new ChessPosition(1, 5)).equals(new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING))) {
                 return possibleCastlingMoves;
             }
             if (canKSCastle(board, color)) {
@@ -164,7 +164,7 @@ public class CastlingTracker {
                 possibleCastlingMoves.add(whiteQSCastle);
             }
         } else {
-            if (isBlackKingMoved()) {
+            if (isBlackKingMoved() || board.getPiece(new ChessPosition(8, 5)) == null || !board.getPiece(new ChessPosition(8, 5)).equals(new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING))) {
                 return possibleCastlingMoves;
             }
             if (canKSCastle(board, color)) {
