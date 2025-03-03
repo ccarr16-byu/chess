@@ -1,11 +1,17 @@
 package server;
 
 import dataaccess.*;
+import service.ClearService;
 import spark.*;
 
 public class Server {
+    private final ClearService clearService;
 
     public Server() {
+        UserDAO userDAO = new MemoryUserDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
+        this.clearService = new ClearService(userDAO, authDAO, gameDAO);
     }
 
     public int run(int desiredPort) {
@@ -36,33 +42,33 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object clear(Request request, Response response) {
-
+    private Object clear(Request request, Response response) throws DataAccessException {
+        clearService.clear();
+        response.status(200);
+        return "";
     }
 
     private Object register(Request request, Response response) throws DataAccessException {
-
+        return null;
     }
 
     private Object login(Request request, Response response) throws DataAccessException {
-
+        return null;
     }
 
     private Object logout(Request request, Response response) throws DataAccessException {
-
+        return null;
     }
 
     private Object listGames(Request request, Response response) throws DataAccessException {
-
+        return null;
     }
 
     private Object createGame(Request request, Response response) throws DataAccessException {
-
+        return null;
     }
 
     private Object joinGame(Request request, Response response) throws DataAccessException {
-
+        return null;
     }
-
-
 }
