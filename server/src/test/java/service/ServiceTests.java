@@ -5,6 +5,7 @@ import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +16,7 @@ public class ServiceTests {
 
     static final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
     static final RegisterService registerService = new RegisterService(userDAO, authDAO);
+    static final LoginService loginService = new LoginService(userDAO, authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {
@@ -58,5 +60,24 @@ public class ServiceTests {
     void negativeClearTest() {
         // I can't think of a way to purposefully make clear() fail, so this is just here as a placeholder
         assertNotEquals(0, 1);
+    }
+
+    @Test
+    void positiveLoginTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        registerService.register(user);
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+
+        assertDoesNotThrow(() -> loginService.login(loginRequest));
+    }
+
+    @Test
+    void negativeLoginTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        registerService.register(user);
+        LoginRequest loginRequest = new LoginRequest(user.username(), null);
+
+        DataAccessException thrown = assertThrows(DataAccessException.class, () -> loginService.login(loginRequest));
+        assertEquals("401#Error: unauthorized", thrown.getMessage());
     }
 }

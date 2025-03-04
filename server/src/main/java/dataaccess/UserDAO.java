@@ -11,5 +11,5 @@ public interface UserDAO {
 
     Collection<UserData> listUsers() throws DataAccessException;
 
-    void clear() throws DataAccessException;
+    void clear();
 }

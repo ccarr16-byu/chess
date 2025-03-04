@@ -5,7 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
-import server.RegisterResponse;
+import server.LoginResponse;
 
 
 public class RegisterService {
@@ -17,11 +17,11 @@ public class RegisterService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResponse register(UserData userData) throws DataAccessException {
+    public LoginResponse register(UserData userData) throws DataAccessException {
         if (userDAO.getUser(userData.username()) == null) {
             userDAO.createUser(userData);
             AuthData authData = authDAO.createAuth(new AuthData("", userData.username()));
-            return new RegisterResponse(userData.username(), authData.authToken());
+            return new LoginResponse(userData.username(), authData.authToken());
         } else {
             throw new DataAccessException("403#Error: already taken");
         }

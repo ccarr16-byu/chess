@@ -3,13 +3,15 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
-import service.ClearService;
-import service.RegisterService;
+import service.*;
 import spark.*;
+
+import java.lang.reflect.Field;
 
 public class Server {
     private final ClearService clearService;
     private final RegisterService registerService;
+    private final LoginService loginService;
 
     public Server() {
         UserDAO userDAO = new MemoryUserDAO();
@@ -17,6 +19,7 @@ public class Server {
         AuthDAO authDAO = new MemoryAuthDAO();
         this.clearService = new ClearService(userDAO, authDAO, gameDAO);
         this.registerService = new RegisterService(userDAO, authDAO);
+        this.loginService = new LoginService(userDAO, authDAO);
     }
 
     public int run(int desiredPort) {
@@ -47,31 +50,44 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object clear(Request request, Response response) throws DataAccessException {
-        clearService.clear();
-        response.status(200);
-        return "";
+    private Object clear(Request request, Response response) {
+        try {
+            clearService.clear();
+            return success(null, response);
+        } catch (Exception e) {
+            return unexpectedError(e, response);
+        }
     }
 
-    private Object register(Request request, Response response) throws DataAccessException {
+    private Object register(Request request, Response response) {
         UserData userData = new Gson().fromJson(request.body(), UserData.class);
-        if (userData.username() == null || userData.password() == null || userData.email() == null) {
-            return this.processError("400#Error: bad request", response);
+        if (!validateInputs(userData)) {
+            return badRequest(response);
         }
         try {
-            RegisterResponse registerResponse = registerService.register(userData);
-            response.status(200);
-            return new Gson().toJson(registerResponse);
+            LoginResponse registerResponse = registerService.register(userData);
+            return this.success(registerResponse, response);
         } catch (DataAccessException e) {
             return this.processError(e.getMessage(), response);
         } catch (Exception e) {
-            String errorString = "500#Error: " + e.getMessage();
-            return this.processError(errorString, response);
+            return unexpectedError(e, response);
         }
     }
 
     private Object login(Request request, Response response) throws DataAccessException {
-        return null;
+        LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
+        if (!validateInputs(loginRequest)) {
+            return badRequest(response);
+        }
+        try {
+            LoginResponse loginResponse = loginService.login(loginRequest);
+            return this.success(loginResponse, response);
+        } catch (DataAccessException e) {
+            return this.processError(e.getMessage(), response);
+        } catch (Exception e) {
+            return unexpectedError(e, response);
+        }
+
     }
 
     private Object logout(Request request, Response response) throws DataAccessException {
@@ -95,5 +111,35 @@ public class Server {
         response.status(Integer.parseInt(messageArray[0]));
         ErrorResponse errorResponse = new ErrorResponse(messageArray[1]);
         return new Gson().toJson(errorResponse);
+    }
+
+    private Object unexpectedError(Exception e, Response response) {
+        String errorString = "500#Error: " + e.getMessage();
+        return this.processError(errorString, response);
+    }
+
+    private Object badRequest(Response response) {
+        return this.processError("400#Error: bad request", response);
+    }
+
+    private Object success(Object requestOutput, Response response) {
+        response.status(200);
+        return new Gson().toJson(requestOutput);
+    }
+
+    private Boolean validateInputs(Object requestObject) {
+        Class<?> requestClass = requestObject.getClass();
+        Field[] fields = requestClass.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                if (field.get(requestObject) == null) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
     }
 }
