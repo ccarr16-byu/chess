@@ -2,7 +2,10 @@ package dataaccess;
 
 import model.UserData;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class MemoryUserDAO implements UserDAO {
     final private HashMap<String, UserData> users = new HashMap<>();
@@ -21,6 +24,13 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         return users.getOrDefault(username, null);
+    }
+
+    @Override
+    public Collection<UserData> listUsers() throws DataAccessException {
+        List<UserData> listOfUsers = new ArrayList<>();
+        users.forEach((id, game) -> listOfUsers.add(game));
+        return listOfUsers;
     }
 
     @Override

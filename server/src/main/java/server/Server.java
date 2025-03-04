@@ -55,9 +55,19 @@ public class Server {
 
     private Object register(Request request, Response response) throws DataAccessException {
         UserData userData = new Gson().fromJson(request.body(), UserData.class);
-        RegisterResponse registerResponse = registerService.register(userData);
-        response.status(200);
-        return new Gson().toJson(registerResponse);
+        if (userData.username() == null || userData.password() == null || userData.email() == null) {
+            return this.processError("400#Error: bad request", response);
+        }
+        try {
+            RegisterResponse registerResponse = registerService.register(userData);
+            response.status(200);
+            return new Gson().toJson(registerResponse);
+        } catch (DataAccessException e) {
+            return this.processError(e.getMessage(), response);
+        } catch (Exception e) {
+            String errorString = "500#Error: " + e.getMessage();
+            return this.processError(errorString, response);
+        }
     }
 
     private Object login(Request request, Response response) throws DataAccessException {
@@ -78,5 +88,12 @@ public class Server {
 
     private Object joinGame(Request request, Response response) throws DataAccessException {
         return null;
+    }
+
+    private Object processError(String message, Response response) {
+        String[] messageArray = message.split("#");
+        response.status(Integer.parseInt(messageArray[0]));
+        ErrorResponse errorResponse = new ErrorResponse(messageArray[1]);
+        return new Gson().toJson(errorResponse);
     }
 }

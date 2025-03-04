@@ -23,7 +23,7 @@ public class RegisterService {
             AuthData authData = authDAO.createAuth(new AuthData("", userData.username()));
             return new RegisterResponse(userData.username(), authData.authToken());
         } else {
-            throw new DataAccessException("Unable to register");
+            throw new DataAccessException("403#Error: already taken");
         }
     }
 }
