@@ -64,12 +64,6 @@ public class ServiceTests {
     }
 
     @Test
-    void negativeClearTest() {
-        // I can't think of a way to purposefully make clear() fail, so this is just here as a placeholder
-        assertNotEquals(0, 1);
-    }
-
-    @Test
     void positiveLoginTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
         registerService.register(user);
