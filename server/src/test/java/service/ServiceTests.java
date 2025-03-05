@@ -6,6 +6,7 @@ import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.LoginRequest;
+import server.LoginResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +18,7 @@ public class ServiceTests {
     static final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
     static final RegisterService registerService = new RegisterService(userDAO, authDAO);
     static final LoginService loginService = new LoginService(userDAO, authDAO);
+    static final LogoutService logoutService = new LogoutService(authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {
@@ -79,5 +81,22 @@ public class ServiceTests {
 
         DataAccessException thrown = assertThrows(DataAccessException.class, () -> loginService.login(loginRequest));
         assertEquals("401#Error: unauthorized", thrown.getMessage());
+    }
+
+    @Test
+    void positiveLogoutTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        LoginResponse loginResponse = registerService.register(user);
+        String authToken = loginResponse.authToken();
+
+        assertDoesNotThrow(() -> logoutService.logout(authToken));
+    }
+
+    @Test
+    void negativeLogoutTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        registerService.register(user);
+
+        assertThrows(DataAccessException.class, () -> logoutService.logout("not-an-auth"));
     }
 }
