@@ -13,29 +13,29 @@ import server.LoginResponse;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceTests {
-    static final UserDAO userDAO = new MemoryUserDAO();
-    static final AuthDAO authDAO = new MemoryAuthDAO();
-    static final GameDAO gameDAO = new MemoryGameDAO();
+    static final UserDAO USER_DAO = new MemoryUserDAO();
+    static final AuthDAO AUTH_DAO = new MemoryAuthDAO();
+    static final GameDAO GAME_DAO = new MemoryGameDAO();
 
-    static final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-    static final RegisterService registerService = new RegisterService(userDAO, authDAO);
-    static final LoginService loginService = new LoginService(userDAO, authDAO);
-    static final LogoutService logoutService = new LogoutService(authDAO);
-    static final ListGamesService listGamesService = new ListGamesService(gameDAO, authDAO);
-    static final CreateGameService createGameService = new CreateGameService(gameDAO, authDAO);
-    static final JoinGameService joinGameService = new JoinGameService(gameDAO, authDAO);
+    static final ClearService CLEAR_SERVICE = new ClearService(USER_DAO, AUTH_DAO, GAME_DAO);
+    static final RegisterService REGISTER_SERVICE = new RegisterService(USER_DAO, AUTH_DAO);
+    static final LoginService LOGIN_SERVICE = new LoginService(USER_DAO, AUTH_DAO);
+    static final LogoutService LOGOUT_SERVICE = new LogoutService(AUTH_DAO);
+    static final ListGamesService LIST_GAMES_SERVICE = new ListGamesService(GAME_DAO, AUTH_DAO);
+    static final CreateGameService CREATE_GAME_SERVICE = new CreateGameService(GAME_DAO, AUTH_DAO);
+    static final JoinGameService JOIN_GAME_SERVICE = new JoinGameService(GAME_DAO, AUTH_DAO);
 
     @BeforeEach
     void clear() {
-        clearService.clear();
+        CLEAR_SERVICE.clear();
     }
 
     @Test
     void positiveRegisterTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        registerService.register(user);
+        REGISTER_SERVICE.register(user);
 
-        var users = userDAO.listUsers();
+        var users = USER_DAO.listUsers();
         assertEquals(1, users.size());
         assertTrue(users.contains(user));
     }
@@ -43,110 +43,110 @@ public class ServiceTests {
     @Test
     void negativeRegisterTest() throws DataAccessException {
         UserData user1 = new UserData("user", "password", "email");
-        registerService.register(user1);
+        REGISTER_SERVICE.register(user1);
         UserData user2 = new UserData("user", "password", "email");
 
-        DataAccessException thrown = assertThrows(DataAccessException.class, () -> registerService.register(user2));
+        DataAccessException thrown = assertThrows(DataAccessException.class, () -> REGISTER_SERVICE.register(user2));
         assertEquals("403#Error: already taken", thrown.getMessage());
     }
 
     @Test
     void positiveClearTest() throws DataAccessException {
-        userDAO.createUser(new UserData("username", "password", "email"));
-        authDAO.createAuth(new AuthData("0", "username"));
-        gameDAO.createGame(new GameData(1, "white", "black", "game",
+        USER_DAO.createUser(new UserData("username", "password", "email"));
+        AUTH_DAO.createAuth(new AuthData("0", "username"));
+        GAME_DAO.createGame(new GameData(1, "white", "black", "game",
                 new ChessGame()));
 
-        clearService.clear();
-        assertEquals(0, userDAO.listUsers().size());
-        assertEquals(0, authDAO.listAuths().size());
-        assertEquals(0, gameDAO.listGames().size());
+        CLEAR_SERVICE.clear();
+        assertEquals(0, USER_DAO.listUsers().size());
+        assertEquals(0, AUTH_DAO.listAuths().size());
+        assertEquals(0, GAME_DAO.listGames().size());
     }
 
     @Test
     void positiveLoginTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        registerService.register(user);
+        REGISTER_SERVICE.register(user);
         LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
 
-        assertDoesNotThrow(() -> loginService.login(loginRequest));
+        assertDoesNotThrow(() -> LOGIN_SERVICE.login(loginRequest));
     }
 
     @Test
     void negativeLoginTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        registerService.register(user);
+        REGISTER_SERVICE.register(user);
         LoginRequest loginRequest = new LoginRequest(user.username(), null);
 
-        DataAccessException thrown = assertThrows(DataAccessException.class, () -> loginService.login(loginRequest));
+        DataAccessException thrown = assertThrows(DataAccessException.class, () -> LOGIN_SERVICE.login(loginRequest));
         assertEquals("401#Error: unauthorized", thrown.getMessage());
     }
 
     @Test
     void positiveLogoutTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        LoginResponse loginResponse = registerService.register(user);
+        LoginResponse loginResponse = REGISTER_SERVICE.register(user);
         String authToken = loginResponse.authToken();
 
-        assertDoesNotThrow(() -> logoutService.logout(authToken));
+        assertDoesNotThrow(() -> LOGOUT_SERVICE.logout(authToken));
     }
 
     @Test
     void negativeLogoutTest() {
-        assertThrows(DataAccessException.class, () -> logoutService.logout("not-an-auth"));
+        assertThrows(DataAccessException.class, () -> LOGOUT_SERVICE.logout("not-an-auth"));
     }
 
     @Test
     void positiveListGamesTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        String authToken = registerService.register(user).authToken();
-        gameDAO.createGame(new GameData(0, null, null, "game",
+        String authToken = REGISTER_SERVICE.register(user).authToken();
+        GAME_DAO.createGame(new GameData(0, null, null, "game",
                 new ChessGame()));
 
-        assertDoesNotThrow(() -> listGamesService.listGames(authToken));
-        assertEquals(1, listGamesService.listGames(authToken).games().size());
+        assertDoesNotThrow(() -> LIST_GAMES_SERVICE.listGames(authToken));
+        assertEquals(1, LIST_GAMES_SERVICE.listGames(authToken).games().size());
     }
 
     @Test
     void negativeListGamesTest() {
-        assertThrows(DataAccessException.class, () -> listGamesService.listGames("not-an-auth"));
+        assertThrows(DataAccessException.class, () -> LIST_GAMES_SERVICE.listGames("not-an-auth"));
     }
 
     @Test
     void positiveCreateGameTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        String authToken = registerService.register(user).authToken();
+        String authToken = REGISTER_SERVICE.register(user).authToken();
 
-        assertDoesNotThrow(() -> createGameService.createGame(authToken, new CreateGameRequest("new-game")));
-        assertEquals(1, gameDAO.listGames().size());
+        assertDoesNotThrow(() -> CREATE_GAME_SERVICE.createGame(authToken, new CreateGameRequest("new-game")));
+        assertEquals(1, GAME_DAO.listGames().size());
     }
 
     @Test
     void negativeCreateGameTest() {
-        assertThrows(DataAccessException.class, () -> createGameService.createGame("not-an-auth", new CreateGameRequest("new-game")));
+        assertThrows(DataAccessException.class, () -> CREATE_GAME_SERVICE.createGame("not-an-auth", new CreateGameRequest("new-game")));
     }
 
     @Test
     void positiveJoinGameTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
-        String authToken = registerService.register(user).authToken();
-        int gameID = createGameService.createGame(authToken, new CreateGameRequest("new-game")).gameID();
-        joinGameService.joinGame(authToken, new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID));
+        String authToken = REGISTER_SERVICE.register(user).authToken();
+        int gameID = CREATE_GAME_SERVICE.createGame(authToken, new CreateGameRequest("new-game")).gameID();
+        JOIN_GAME_SERVICE.joinGame(authToken, new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID));
 
-        assertEquals("username", gameDAO.getGame(gameID).whiteUsername());
+        assertEquals("username", GAME_DAO.getGame(gameID).whiteUsername());
     }
 
     @Test
     void negativeJoinGameTest() throws DataAccessException {
         UserData user1 = new UserData("user1", "password", "email");
-        String authToken1 = registerService.register(user1).authToken();
-        int gameID = createGameService.createGame(authToken1, new CreateGameRequest("new-game")).gameID();
-        joinGameService.joinGame(authToken1, new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID));
+        String authToken1 = REGISTER_SERVICE.register(user1).authToken();
+        int gameID = CREATE_GAME_SERVICE.createGame(authToken1, new CreateGameRequest("new-game")).gameID();
+        JOIN_GAME_SERVICE.joinGame(authToken1, new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID));
         UserData user2 = new UserData("user2", "password", "email");
-        String authToken2 = registerService.register(user2).authToken();
+        String authToken2 = REGISTER_SERVICE.register(user2).authToken();
 
-        assertThrows(DataAccessException.class, () -> joinGameService.joinGame(authToken2,
+        assertThrows(DataAccessException.class, () -> JOIN_GAME_SERVICE.joinGame(authToken2,
                 new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID)));
-        assertEquals("user1", gameDAO.getGame(gameID).whiteUsername());
+        assertEquals("user1", GAME_DAO.getGame(gameID).whiteUsername());
     }
 }
