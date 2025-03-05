@@ -28,7 +28,7 @@ public class MemoryAuthDAO implements AuthDAO {
     @Override
     public Collection<AuthData> listAuths() {
         List<AuthData> listOfAuths = new ArrayList<>();
-        auths.forEach((_, game) -> listOfAuths.add(game));
+        auths.forEach((id, game) -> listOfAuths.add(game));
         return listOfAuths;
     }
 

@@ -30,7 +30,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public Collection<GameData> listGames() {
         List<GameData> listOfGames = new ArrayList<>();
-        games.forEach((_, game) -> listOfGames.add(game));
+        games.forEach((id, game) -> listOfGames.add(game));
         return listOfGames;
     }
 

@@ -22,12 +22,12 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) {
         return users.getOrDefault(username, null);
     }
 
     @Override
-    public Collection<UserData> listUsers() throws DataAccessException {
+    public Collection<UserData> listUsers() {
         List<UserData> listOfUsers = new ArrayList<>();
         users.forEach((id, game) -> listOfUsers.add(game));
         return listOfUsers;
