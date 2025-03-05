@@ -14,6 +14,7 @@ public class Server {
     private final LoginService loginService;
     private final LogoutService logoutService;
     private final ListGamesService listGamesService;
+    private final CreateGameService createGameService;
 
     public Server() {
         UserDAO userDAO = new MemoryUserDAO();
@@ -24,6 +25,7 @@ public class Server {
         this.loginService = new LoginService(userDAO, authDAO);
         this.logoutService = new LogoutService(authDAO);
         this.listGamesService = new ListGamesService(gameDAO, authDAO);
+        this.createGameService = new CreateGameService(gameDAO, authDAO);
     }
 
     public int run(int desiredPort) {
@@ -119,7 +121,19 @@ public class Server {
     }
 
     private Object createGame(Request request, Response response) throws DataAccessException {
-        return null;
+        String authToken = request.headers("Authorization");
+        CreateGameRequest createGameRequest = new Gson().fromJson(request.body(), CreateGameRequest.class);
+        if (createGameRequest.gameName() == null) {
+            return badRequest(response);
+        }
+        try {
+            CreateGameResponse createGameResponse = createGameService.createGame(authToken, createGameRequest);
+            return success(createGameResponse, response);
+        } catch (DataAccessException e) {
+            return this.processError(e.getMessage(), response);
+        } catch (Exception e) {
+            return unexpectedError(e, response);
+        }
     }
 
     private Object joinGame(Request request, Response response) throws DataAccessException {

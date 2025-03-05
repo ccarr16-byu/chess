@@ -5,6 +5,7 @@ import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.CreateGameRequest;
 import server.LoginRequest;
 import server.LoginResponse;
 
@@ -20,6 +21,7 @@ public class ServiceTests {
     static final LoginService loginService = new LoginService(userDAO, authDAO);
     static final LogoutService logoutService = new LogoutService(authDAO);
     static final ListGamesService listGamesService = new ListGamesService(gameDAO, authDAO);
+    static final CreateGameService createGameService = new CreateGameService(gameDAO, authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {
@@ -95,9 +97,6 @@ public class ServiceTests {
 
     @Test
     void negativeLogoutTest() throws DataAccessException {
-        UserData user = new UserData("username", "password", "email");
-        registerService.register(user);
-
         assertThrows(DataAccessException.class, () -> logoutService.logout("not-an-auth"));
     }
 
@@ -105,15 +104,29 @@ public class ServiceTests {
     void positiveListGamesTest() throws DataAccessException {
         UserData user = new UserData("username", "password", "email");
         String authToken = registerService.register(user).authToken();
+        gameDAO.createGame(new GameData(0, null, null, "game",
+                new ChessGame()));
 
         assertDoesNotThrow(() -> listGamesService.listGames(authToken));
+        assertEquals(1, listGamesService.listGames(authToken).games().size());
     }
 
     @Test
-    void negativeListGamesTest() throws DataAccessException {
-        UserData user = new UserData("username", "password", "email");
-        registerService.register(user);
-
+    void negativeListGamesTest() {
         assertThrows(DataAccessException.class, () -> listGamesService.listGames("not-an-auth"));
+    }
+
+    @Test
+    void positiveCreateGameTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        String authToken = registerService.register(user).authToken();
+
+        assertDoesNotThrow(() -> createGameService.createGame(authToken, new CreateGameRequest("new-game")));
+        assertEquals(1, gameDAO.listGames().size());
+    }
+
+    @Test
+    void negativeCreateGameTest() {
+        assertThrows(DataAccessException.class, () -> createGameService.createGame("not-an-auth", new CreateGameRequest("new-game")));
     }
 }
