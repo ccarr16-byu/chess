@@ -2,9 +2,6 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
-import model.AuthData;
-
-import java.util.Objects;
 
 public class LogoutService {
     private final AuthDAO authDAO;
@@ -14,11 +11,9 @@ public class LogoutService {
     }
 
     public void logout(String authToken) throws DataAccessException {
-        for (AuthData auth : authDAO.listAuths()) {
-            if (Objects.equals(auth.authToken(), authToken)) {
-                authDAO.deleteAuth(authToken);
-                return;
-            }
+        if (authDAO.getAuth(authToken) != null) {
+            authDAO.deleteAuth(authToken);
+            return;
         }
         throw new DataAccessException("401#Error: unauthorized");
     }

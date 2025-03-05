@@ -19,6 +19,7 @@ public class ServiceTests {
     static final RegisterService registerService = new RegisterService(userDAO, authDAO);
     static final LoginService loginService = new LoginService(userDAO, authDAO);
     static final LogoutService logoutService = new LogoutService(authDAO);
+    static final ListGamesService listGamesService = new ListGamesService(gameDAO, authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {
@@ -98,5 +99,21 @@ public class ServiceTests {
         registerService.register(user);
 
         assertThrows(DataAccessException.class, () -> logoutService.logout("not-an-auth"));
+    }
+
+    @Test
+    void positiveListGamesTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        String authToken = registerService.register(user).authToken();
+
+        assertDoesNotThrow(() -> listGamesService.listGames(authToken));
+    }
+
+    @Test
+    void negativeListGamesTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        registerService.register(user);
+
+        assertThrows(DataAccessException.class, () -> listGamesService.listGames("not-an-auth"));
     }
 }

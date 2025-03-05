@@ -13,6 +13,7 @@ public class Server {
     private final RegisterService registerService;
     private final LoginService loginService;
     private final LogoutService logoutService;
+    private final ListGamesService listGamesService;
 
     public Server() {
         UserDAO userDAO = new MemoryUserDAO();
@@ -22,6 +23,7 @@ public class Server {
         this.registerService = new RegisterService(userDAO, authDAO);
         this.loginService = new LoginService(userDAO, authDAO);
         this.logoutService = new LogoutService(authDAO);
+        this.listGamesService = new ListGamesService(gameDAO, authDAO);
     }
 
     public int run(int desiredPort) {
@@ -105,7 +107,15 @@ public class Server {
     }
 
     private Object listGames(Request request, Response response) throws DataAccessException {
-        return null;
+        String authToken = request.headers("Authorization");
+        try {
+            ListGamesResponse listGamesResponse = listGamesService.listGames(authToken);
+            return success(listGamesResponse, response);
+        } catch (DataAccessException e) {
+            return this.processError(e.getMessage(), response);
+        } catch (Exception e) {
+            return unexpectedError(e, response);
+        }
     }
 
     private Object createGame(Request request, Response response) throws DataAccessException {
