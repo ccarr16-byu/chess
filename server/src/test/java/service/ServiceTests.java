@@ -26,7 +26,7 @@ public class ServiceTests {
     static final JoinGameService joinGameService = new JoinGameService(gameDAO, authDAO);
 
     @BeforeEach
-    void clear() throws DataAccessException {
+    void clear() {
         clearService.clear();
     }
 
@@ -98,7 +98,7 @@ public class ServiceTests {
     }
 
     @Test
-    void negativeLogoutTest() throws DataAccessException {
+    void negativeLogoutTest() {
         assertThrows(DataAccessException.class, () -> logoutService.logout("not-an-auth"));
     }
 

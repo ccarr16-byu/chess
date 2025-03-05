@@ -82,7 +82,7 @@ public class Server {
         }
     }
 
-    private Object login(Request request, Response response) throws DataAccessException {
+    private Object login(Request request, Response response) {
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
         if (!validateInputs(loginRequest)) {
             return badRequest(response);
@@ -98,7 +98,7 @@ public class Server {
 
     }
 
-    private Object logout(Request request, Response response) throws DataAccessException {
+    private Object logout(Request request, Response response) {
         String authToken = request.headers("Authorization");
         try {
             logoutService.logout(authToken);
@@ -110,7 +110,7 @@ public class Server {
         }
     }
 
-    private Object listGames(Request request, Response response) throws DataAccessException {
+    private Object listGames(Request request, Response response) {
         String authToken = request.headers("Authorization");
         try {
             ListGamesResponse listGamesResponse = listGamesService.listGames(authToken);
@@ -122,7 +122,7 @@ public class Server {
         }
     }
 
-    private Object createGame(Request request, Response response) throws DataAccessException {
+    private Object createGame(Request request, Response response) {
         String authToken = request.headers("Authorization");
         CreateGameRequest createGameRequest = new Gson().fromJson(request.body(), CreateGameRequest.class);
         if (createGameRequest.gameName() == null) {

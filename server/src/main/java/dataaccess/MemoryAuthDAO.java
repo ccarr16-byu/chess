@@ -8,7 +8,7 @@ public class MemoryAuthDAO implements AuthDAO {
     final private HashMap<String, AuthData> auths = new HashMap<>();
 
     @Override
-    public AuthData createAuth(AuthData authData) throws DataAccessException {
+    public AuthData createAuth(AuthData authData) {
         String newToken = UUID.randomUUID().toString();
         authData = new AuthData(newToken, authData.username());
         auths.put(newToken, authData);
@@ -21,14 +21,14 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) {
         auths.remove(authToken);
     }
 
     @Override
-    public Collection<AuthData> listAuths() throws DataAccessException {
+    public Collection<AuthData> listAuths() {
         List<AuthData> listOfAuths = new ArrayList<>();
-        auths.forEach((id, game) -> listOfAuths.add(game));
+        auths.forEach((_, game) -> listOfAuths.add(game));
         return listOfAuths;
     }
 
