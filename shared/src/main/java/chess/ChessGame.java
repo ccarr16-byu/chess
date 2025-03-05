@@ -111,7 +111,8 @@ public class ChessGame {
             validMoves.addAll(castlingTracker.possibleCastlingMoves(board, color));
         }
         if (board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.PAWN) {
-            if (enPassantTracker.isEnPassantAllowed() && enPassantTracker.getAttackingSquares().contains(startPosition)) {
+            if (enPassantTracker.isEnPassantAllowed() &&
+                    enPassantTracker.getAttackingSquares().contains(startPosition)) {
                 validMoves.add(new ChessMove(startPosition, enPassantTracker.getKillDestination(), null));
             }
         }
@@ -144,27 +145,37 @@ public class ChessGame {
                 if (enPassantTracker.isEnPassantAllowed()) {
                     enPassantTracker.setEnPassantAllowed();
                 }
-                ChessMove whiteKSCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 7), null);
-                ChessMove whiteQSCastle = new ChessMove(new ChessPosition(1, 5), new ChessPosition(1, 3), null);
-                ChessMove blackKSCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 7), null);
-                ChessMove blackQSCastle = new ChessMove(new ChessPosition(8, 5), new ChessPosition(8, 3), null);
+                ChessMove whiteKSCastle = new ChessMove(new ChessPosition(1, 5),
+                        new ChessPosition(1, 7), null);
+                ChessMove whiteQSCastle = new ChessMove(new ChessPosition(1, 5),
+                        new ChessPosition(1, 3), null);
+                ChessMove blackKSCastle = new ChessMove(new ChessPosition(8, 5),
+                        new ChessPosition(8, 7), null);
+                ChessMove blackQSCastle = new ChessMove(new ChessPosition(8, 5),
+                        new ChessPosition(8, 3), null);
                 if (move.equals(whiteKSCastle)) {
-                    board.addPiece(new ChessPosition(1, 6), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(1, 6), new ChessPiece(TeamColor.WHITE,
+                            ChessPiece.PieceType.ROOK));
                     board.addPiece(new ChessPosition(1, 8), null);
                 } else if (move.equals(whiteQSCastle)) {
-                    board.addPiece(new ChessPosition(1, 4), new ChessPiece(TeamColor.WHITE, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(1, 4), new ChessPiece(TeamColor.WHITE,
+                            ChessPiece.PieceType.ROOK));
                     board.addPiece(new ChessPosition(1, 1), null);
                 } else if (move.equals(blackKSCastle)) {
-                    board.addPiece(new ChessPosition(8, 6), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(8, 6), new ChessPiece(TeamColor.BLACK,
+                            ChessPiece.PieceType.ROOK));
                     board.addPiece(new ChessPosition(8, 8), null);
                 } else if (move.equals(blackQSCastle)) {
-                    board.addPiece(new ChessPosition(8, 4), new ChessPiece(TeamColor.BLACK, ChessPiece.PieceType.ROOK));
+                    board.addPiece(new ChessPosition(8, 4), new ChessPiece(TeamColor.BLACK,
+                            ChessPiece.PieceType.ROOK));
                     board.addPiece(new ChessPosition(8, 1), null);
                 }
             } else if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                if (move.getEndPosition().getRow() == move.getStartPosition().getRow() + 2 || move.getEndPosition().getRow() == move.getStartPosition().getRow() - 2) {
+                if (move.getEndPosition().getRow() == move.getStartPosition().getRow() + 2 ||
+                        move.getEndPosition().getRow() == move.getStartPosition().getRow() - 2) {
                     enPassantTracker = new EnPassantTracker(move.getEndPosition(), piece.getTeamColor());
-                } else if (enPassantTracker.isEnPassantAllowed() && enPassantTracker.getKillDestination().equals(move.getEndPosition())) {
+                } else if (enPassantTracker.isEnPassantAllowed() &&
+                        enPassantTracker.getKillDestination().equals(move.getEndPosition())) {
                     board.addPiece(new ChessPosition(enPassantTracker.getVulnerablePawn()), null);
                     enPassantTracker.setEnPassantAllowed();
                 } else {

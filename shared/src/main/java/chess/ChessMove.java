@@ -57,7 +57,8 @@ public class ChessMove {
                 default -> 0;
             };
         }
-        return (this.getStartPosition().getRow() * 10000) + (this.getStartPosition().getColumn() * 1000) + (this.getEndPosition().getRow() * 100) + (this.getEndPosition().getColumn() * 10) + pieceNum;
+        return (this.getStartPosition().getRow() * 10000) + (this.getStartPosition().getColumn() * 1000) +
+                (this.getEndPosition().getRow() * 100) + (this.getEndPosition().getColumn() * 10) + pieceNum;
     }
 
     @Override
