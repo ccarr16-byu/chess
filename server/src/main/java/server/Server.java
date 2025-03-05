@@ -9,16 +9,17 @@ import spark.*;
 import java.lang.reflect.Field;
 
 public class Server {
+    private final GameDAO gameDAO = new MemoryGameDAO();
     private final ClearService clearService;
     private final RegisterService registerService;
     private final LoginService loginService;
     private final LogoutService logoutService;
     private final ListGamesService listGamesService;
     private final CreateGameService createGameService;
+    private final JoinGameService joinGameService;
 
     public Server() {
         UserDAO userDAO = new MemoryUserDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
         this.clearService = new ClearService(userDAO, authDAO, gameDAO);
         this.registerService = new RegisterService(userDAO, authDAO);
@@ -26,6 +27,7 @@ public class Server {
         this.logoutService = new LogoutService(authDAO);
         this.listGamesService = new ListGamesService(gameDAO, authDAO);
         this.createGameService = new CreateGameService(gameDAO, authDAO);
+        this.joinGameService = new JoinGameService(gameDAO, authDAO);
     }
 
     public int run(int desiredPort) {
@@ -137,7 +139,21 @@ public class Server {
     }
 
     private Object joinGame(Request request, Response response) throws DataAccessException {
-        return null;
+        String authToken = request.headers("Authorization");
+        JoinGameRequest joinGameRequest = new Gson().fromJson(request.body(), JoinGameRequest.class);
+        if (joinGameRequest.gameID() == null || joinGameRequest.playerColor() == null) {
+            return badRequest(response);
+        } else if (gameDAO.getGame(joinGameRequest.gameID()) == null) {
+            return badRequest(response);
+        }
+        try {
+            joinGameService.joinGame(authToken, joinGameRequest);
+            return success(null, response);
+        } catch (DataAccessException e) {
+            return this.processError(e.getMessage(), response);
+        } catch (Exception e) {
+            return unexpectedError(e, response);
+        }
     }
 
     private Object processError(String message, Response response) {

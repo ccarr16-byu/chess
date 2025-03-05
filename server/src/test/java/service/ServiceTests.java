@@ -6,6 +6,7 @@ import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.CreateGameRequest;
+import server.JoinGameRequest;
 import server.LoginRequest;
 import server.LoginResponse;
 
@@ -22,6 +23,7 @@ public class ServiceTests {
     static final LogoutService logoutService = new LogoutService(authDAO);
     static final ListGamesService listGamesService = new ListGamesService(gameDAO, authDAO);
     static final CreateGameService createGameService = new CreateGameService(gameDAO, authDAO);
+    static final JoinGameService joinGameService = new JoinGameService(gameDAO, authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {
@@ -128,5 +130,29 @@ public class ServiceTests {
     @Test
     void negativeCreateGameTest() {
         assertThrows(DataAccessException.class, () -> createGameService.createGame("not-an-auth", new CreateGameRequest("new-game")));
+    }
+
+    @Test
+    void positiveJoinGameTest() throws DataAccessException {
+        UserData user = new UserData("username", "password", "email");
+        String authToken = registerService.register(user).authToken();
+        int gameID = createGameService.createGame(authToken, new CreateGameRequest("new-game")).gameID();
+        joinGameService.joinGame(authToken, new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID));
+
+        assertEquals("username", gameDAO.getGame(gameID).whiteUsername());
+    }
+
+    @Test
+    void negativeJoinGameTest() throws DataAccessException {
+        UserData user1 = new UserData("user1", "password", "email");
+        String authToken1 = registerService.register(user1).authToken();
+        int gameID = createGameService.createGame(authToken1, new CreateGameRequest("new-game")).gameID();
+        joinGameService.joinGame(authToken1, new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID));
+        UserData user2 = new UserData("user2", "password", "email");
+        String authToken2 = registerService.register(user2).authToken();
+
+        assertThrows(DataAccessException.class, () -> joinGameService.joinGame(authToken2,
+                new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID)));
+        assertEquals("user1", gameDAO.getGame(gameID).whiteUsername());
     }
 }
