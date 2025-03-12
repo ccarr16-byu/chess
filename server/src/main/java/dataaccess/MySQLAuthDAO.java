@@ -38,9 +38,13 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     private final String[] createStatements = {
-            """
-                ;
-            """
+        """
+            CREATE TABLE IF NOT EXISTS auths (
+                `authToken` varchar(256) NOT NULL,
+                `username` varchar(256) NOT NULL,
+                PRIMARY KEY (`authToken`)
+            )
+        """
     };
 
     private void configureDatabase() throws DataAccessException {
