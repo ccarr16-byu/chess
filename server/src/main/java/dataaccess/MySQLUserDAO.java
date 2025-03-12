@@ -2,10 +2,16 @@ package dataaccess;
 
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 public class MySQLUserDAO implements UserDAO {
+
+    public MySQLUserDAO() throws DataAccessException {
+        configureDatabase();
+    }
+
     @Override
     public UserData createUser(UserData userData) throws DataAccessException {
         return null;
@@ -24,5 +30,24 @@ public class MySQLUserDAO implements UserDAO {
     @Override
     public void clear() {
 
+    }
+
+    private final String[] createStatements = {
+        """
+            ;
+        """
+    };
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
+        }
     }
 }

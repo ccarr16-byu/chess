@@ -1,35 +1,35 @@
 package dataaccess;
 
-import model.GameData;
+import model.AuthData;
 
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-public class MySQLGameDAO implements GameDAO {
+public class MySQLAuthDAO implements AuthDAO {
 
-    public MySQLGameDAO() throws DataAccessException {
+    public MySQLAuthDAO() throws DataAccessException {
         configureDatabase();
     }
 
     @Override
-    public GameData createGame(GameData game) throws DataAccessException {
+    public AuthData createAuth(AuthData authData) throws DataAccessException {
         return null;
     }
 
     @Override
-    public GameData getGame(int id) throws DataAccessException {
+    public AuthData getAuth(String authToken) {
         return null;
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
+    public void deleteAuth(String authToken) throws DataAccessException {
+
+    }
+
+    @Override
+    public Collection<AuthData> listAuths() throws DataAccessException {
         return List.of();
-    }
-
-    @Override
-    public void updateGame(int id, GameData updatedGame) throws DataAccessException {
-
     }
 
     @Override
@@ -38,9 +38,9 @@ public class MySQLGameDAO implements GameDAO {
     }
 
     private final String[] createStatements = {
-        """
-            ;
-        """
+            """
+                ;
+            """
     };
 
     private void configureDatabase() throws DataAccessException {
