@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 public class Server {
 
 
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final GameDAO gameDAO = new MySQLGameDAO();
     private final ClearService clearService;
     private final RegisterService registerService;
     private final LoginService loginService;
@@ -23,7 +23,7 @@ public class Server {
 
     public Server() throws DataAccessException {
         UserDAO userDAO = new MySQLUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
+        AuthDAO authDAO = new MySQLAuthDAO();
         this.clearService = new ClearService(userDAO, authDAO, gameDAO);
         this.registerService = new RegisterService(userDAO, authDAO);
         this.loginService = new LoginService(userDAO, authDAO);
