@@ -1,5 +1,7 @@
 package chess;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -316,5 +318,10 @@ public class ChessGame {
 
     public EnPassantTracker getEnPassantTracker() {
         return this.enPassantTracker;
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

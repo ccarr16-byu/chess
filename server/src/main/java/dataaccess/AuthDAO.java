@@ -13,5 +13,5 @@ public interface AuthDAO {
 
     Collection<AuthData> listAuths() throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 }

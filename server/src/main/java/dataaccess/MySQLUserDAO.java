@@ -6,10 +6,23 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import static dataaccess.DatabaseManager.executeUpdate;
+
 public class MySQLUserDAO implements UserDAO {
 
     public MySQLUserDAO() throws DataAccessException {
-        configureDatabase();
+        String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                `username` varchar(256) NOT NULL,
+                `password` varchar(256) NOT NULL,
+                `email` varchar(256) NOT NULL,
+                PRIMARY KEY (`username`)
+            )
+            """
+        };
+
+        DatabaseManager.configureDatabase(createStatements);
     }
 
     @Override
@@ -24,35 +37,14 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public Collection<UserData> listUsers() throws DataAccessException {
+
         return List.of();
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        var statement = "TRUNCATE users";
+        executeUpdate(statement);
     }
 
-    private final String[] createStatements = {
-        """
-            CREATE TABLE IF NOT EXISTS users (
-                `username` varchar(256) NOT NULL,
-                `password` varchar(256) NOT NULL,
-                `email` varchar(256) NOT NULL,
-                PRIMARY KEY (`username`)
-            )
-        """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }

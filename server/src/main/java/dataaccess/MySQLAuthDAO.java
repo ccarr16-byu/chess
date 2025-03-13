@@ -1,15 +1,28 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import static dataaccess.DatabaseManager.executeUpdate;
+
 public class MySQLAuthDAO implements AuthDAO {
 
     public MySQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+        String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS auths (
+                `authToken` varchar(256) NOT NULL,
+                `username` varchar(256) NOT NULL,
+                PRIMARY KEY (`authToken`)
+            )
+            """
+        };
+
+        DatabaseManager.configureDatabase(createStatements);
     }
 
     @Override
@@ -33,30 +46,9 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        var statement = "TRUNCATE auths";
+        executeUpdate(statement);
     }
 
-    private final String[] createStatements = {
-        """
-            CREATE TABLE IF NOT EXISTS auths (
-                `authToken` varchar(256) NOT NULL,
-                `username` varchar(256) NOT NULL,
-                PRIMARY KEY (`authToken`)
-            )
-        """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }

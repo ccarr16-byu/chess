@@ -9,6 +9,8 @@ import spark.*;
 import java.lang.reflect.Field;
 
 public class Server {
+
+
     private final GameDAO gameDAO = new MemoryGameDAO();
     private final ClearService clearService;
     private final RegisterService registerService;
