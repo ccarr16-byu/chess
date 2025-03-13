@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 import service.*;
 import spark.*;
 
@@ -86,6 +87,8 @@ public class Server {
 
     private Object login(Request request, Response response) {
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
+        loginRequest = new LoginRequest(loginRequest.username(),BCrypt.hashpw(loginRequest.password(),
+                BCrypt.gensalt()));
         if (!validateInputs(loginRequest)) {
             return badRequest(response);
         }

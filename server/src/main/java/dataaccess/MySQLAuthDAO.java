@@ -1,11 +1,12 @@
 package dataaccess;
 
-import chess.ChessGame;
 import model.AuthData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import static dataaccess.DatabaseManager.executeUpdate;
 
@@ -27,22 +28,52 @@ public class MySQLAuthDAO implements AuthDAO {
 
     @Override
     public AuthData createAuth(AuthData authData) throws DataAccessException {
-        return null;
+        var statement = "INSERT INTO auths (authToken, username) VALUES (?, ?)";
+        String authToken = UUID.randomUUID().toString();
+        executeUpdate(statement, authToken, authData.username());
+        return new AuthData(authToken, authData.username());
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, username FROM auths WHERE authToken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readAuth(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-
+        var statement = "DELETE FROM auths WHERE authToken=?";
+        executeUpdate(statement, authToken);
     }
 
     @Override
     public Collection<AuthData> listAuths() throws DataAccessException {
-        return List.of();
+        var result = new ArrayList<AuthData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, username FROM auths";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        result.add(readAuth(rs));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return result;
     }
 
     @Override
@@ -51,4 +82,9 @@ public class MySQLAuthDAO implements AuthDAO {
         executeUpdate(statement);
     }
 
+    public AuthData readAuth(ResultSet rs) throws SQLException {
+        String authToken = rs.getString("authToken");
+        String username = rs.getString("username");
+        return new AuthData(authToken, username);
+    }
 }
