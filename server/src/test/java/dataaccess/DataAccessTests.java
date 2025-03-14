@@ -129,38 +129,93 @@ public class DataAccessTests {
     }
 
     @Test
-    void positiveGetAuthTest() {
+    void positiveGetAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth = new AuthData(null, "username");
+        String authToken = authDAO.createAuth(auth).authToken();
+        assertDoesNotThrow(() -> authDAO.getAuth(authToken));
     }
 
     @Test
-    void negativeGetAuthTest() {
+    void negativeGetAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth = new AuthData(null, "username");
+        assertNull(authDAO.getAuth("wrong-authToken"));
     }
 
     @Test
-    void positiveDeleteAuthTest() {
+    void positiveDeleteAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth1 = new AuthData(null, "username1");
+        AuthData auth2 = new AuthData(null, "username2");
+        authDAO.createAuth(auth1);
+        authDAO.createAuth(auth2);
+
+        authDAO.deleteAuth(auth1.authToken());
+        assertNull(authDAO.getAuth(auth1.authToken()));
     }
 
     @Test
-    void negativeDeleteAuthTest() {
+    void negativeDeleteAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth = new AuthData(null, "username1");
+        String authToken = authDAO.createAuth(auth).authToken();
+
+        authDAO.deleteAuth("not-authToken");
+        assertNotNull(authDAO.getAuth(authToken));
     }
 
     @Test
-    void positiveListAuthTest() {
+    void positiveListAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth1 = new AuthData(null, "username1");
+        AuthData auth2 = new AuthData(null, "username2");
+        AuthData auth3 = new AuthData(null, "username3");
+        authDAO.createAuth(auth1);
+        authDAO.createAuth(auth2);
+        authDAO.createAuth(auth3);
+
+        assertEquals(3, authDAO.listAuths().size());
     }
 
     @Test
-    void negativeListAuthTest() {
+    void negativeListAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth1 = new AuthData(null, "username1");
+        AuthData auth2 = new AuthData(null, "username2");
+        AuthData auth3 = new AuthData(null, "username3");
+        authDAO.createAuth(auth1);
+        authDAO.createAuth(auth2);
+        authDAO.createAuth(auth3);
+
+        ArrayList<AuthData> noTokensList = new ArrayList<>();
+        noTokensList.add(auth1);
+        noTokensList.add(auth2);
+        noTokensList.add(auth3);
+
+        ArrayList<AuthData> actual = (ArrayList<AuthData>) authDAO.listAuths();
+        assertNotEquals(noTokensList, actual);
     }
 
     @Test
-    void positiveClearAuthTest() {
+    void positiveClearAuthTest() throws DataAccessException {
+        AuthDAO authDAO = getAuthDAO();
 
+        AuthData auth1 = new AuthData(null, "username1");
+        AuthData auth2 = new AuthData(null, "username2");
+        AuthData auth3 = new AuthData(null, "username3");
+        authDAO.createAuth(auth1);
+        authDAO.createAuth(auth2);
+        authDAO.createAuth(auth3);
+
+        authDAO.clear();
+        assertEquals(0, authDAO.listAuths().size());
     }
 
     @Test
