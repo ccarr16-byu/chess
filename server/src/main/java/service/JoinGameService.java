@@ -32,7 +32,7 @@ public class JoinGameService {
         }
     }
 
-    private GameData addPlayer(String authToken, ChessGame.TeamColor playerColor, GameData game) {
+    private GameData addPlayer(String authToken, ChessGame.TeamColor playerColor, GameData game) throws DataAccessException {
         String whiteUserName;
         String blackUserName;
         if (playerColor == ChessGame.TeamColor.WHITE) {

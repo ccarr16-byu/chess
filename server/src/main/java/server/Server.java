@@ -12,7 +12,14 @@ import java.lang.reflect.Field;
 public class Server {
 
 
-    private final GameDAO gameDAO = new MySQLGameDAO();
+    private final GameDAO gameDAO;
+    {
+        try {
+            gameDAO = new MySQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
     private final ClearService clearService;
     private final RegisterService registerService;
     private final LoginService loginService;
@@ -21,16 +28,20 @@ public class Server {
     private final CreateGameService createGameService;
     private final JoinGameService joinGameService;
 
-    public Server() throws DataAccessException {
-        UserDAO userDAO = new MySQLUserDAO();
-        AuthDAO authDAO = new MySQLAuthDAO();
-        this.clearService = new ClearService(userDAO, authDAO, gameDAO);
-        this.registerService = new RegisterService(userDAO, authDAO);
-        this.loginService = new LoginService(userDAO, authDAO);
-        this.logoutService = new LogoutService(authDAO);
-        this.listGamesService = new ListGamesService(gameDAO, authDAO);
-        this.createGameService = new CreateGameService(gameDAO, authDAO);
-        this.joinGameService = new JoinGameService(gameDAO, authDAO);
+    public Server() {
+        try {
+            UserDAO userDAO = new MySQLUserDAO();
+            AuthDAO authDAO = new MySQLAuthDAO();
+            this.clearService = new ClearService(userDAO, authDAO, gameDAO);
+            this.registerService = new RegisterService(userDAO, authDAO);
+            this.loginService = new LoginService(userDAO, authDAO);
+            this.logoutService = new LogoutService(authDAO);
+            this.listGamesService = new ListGamesService(gameDAO, authDAO);
+            this.createGameService = new CreateGameService(gameDAO, authDAO);
+            this.joinGameService = new JoinGameService(gameDAO, authDAO);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int run(int desiredPort) {
@@ -87,8 +98,6 @@ public class Server {
 
     private Object login(Request request, Response response) {
         LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
-        loginRequest = new LoginRequest(loginRequest.username(),BCrypt.hashpw(loginRequest.password(),
-                BCrypt.gensalt()));
         if (!validateInputs(loginRequest)) {
             return badRequest(response);
         }

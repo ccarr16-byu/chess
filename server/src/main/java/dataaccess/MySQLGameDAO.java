@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import model.GameData;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -85,7 +84,7 @@ public class MySQLGameDAO implements GameDAO {
                             """        
                             UPDATE games
                             SET gameID = ?, whiteUsername = ?, blackUsername = ?, gameName = ?, gameState = ?
-                            WHERE id = ?
+                            WHERE gameID = ?
                             """;
 
                         executeUpdate(statement2, id, updatedGame.whiteUsername(), updatedGame.blackUsername(),
@@ -104,14 +103,18 @@ public class MySQLGameDAO implements GameDAO {
         executeUpdate(statement);
     }
 
-    public GameData readGame(ResultSet rs) throws SQLException {
-        int gameID = rs.getInt("gameID");
-        String whiteUsername = rs.getString("whiteUsername");
-        String blackUsername = rs.getString("blackUsername");
-        String gameName = rs.getString("gameName");
-        String gameStateJson = rs.getString("gameState");
-        ChessGame gameState = new Gson().fromJson(gameStateJson, ChessGame.class);
-        return new GameData(gameID, whiteUsername, blackUsername, gameName, gameState);
+    public GameData readGame(ResultSet rs) throws DataAccessException {
+        try {
+            int gameID = rs.getInt("gameID");
+            String whiteUsername = rs.getString("whiteUsername");
+            String blackUsername = rs.getString("blackUsername");
+            String gameName = rs.getString("gameName");
+            String gameStateJson = rs.getString("gameState");
+            ChessGame gameState = new Gson().fromJson(gameStateJson, ChessGame.class);
+            return new GameData(gameID, whiteUsername, blackUsername, gameName, gameState);
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
     }
 
 }

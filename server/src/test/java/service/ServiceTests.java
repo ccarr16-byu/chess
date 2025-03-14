@@ -26,7 +26,7 @@ public class ServiceTests {
     static final JoinGameService JOIN_GAME_SERVICE = new JoinGameService(GAME_DAO, AUTH_DAO);
 
     @BeforeEach
-    void clear() {
+    void clear() throws DataAccessException {
         CLEAR_SERVICE.clear();
     }
 

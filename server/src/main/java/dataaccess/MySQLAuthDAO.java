@@ -3,7 +3,6 @@ package dataaccess;
 import model.AuthData;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -82,9 +81,13 @@ public class MySQLAuthDAO implements AuthDAO {
         executeUpdate(statement);
     }
 
-    public AuthData readAuth(ResultSet rs) throws SQLException {
-        String authToken = rs.getString("authToken");
-        String username = rs.getString("username");
-        return new AuthData(authToken, username);
+    public AuthData readAuth(ResultSet rs) throws DataAccessException {
+        try {
+            String authToken = rs.getString("authToken");
+            String username = rs.getString("username");
+            return new AuthData(authToken, username);
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
     }
 }

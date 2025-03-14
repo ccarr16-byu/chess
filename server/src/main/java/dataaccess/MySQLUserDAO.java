@@ -4,10 +4,8 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static dataaccess.DatabaseManager.executeUpdate;
 
@@ -30,6 +28,9 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public UserData createUser(UserData userData) throws DataAccessException {
+        if (userData.username() == null || userData.password() == null || userData.email() == null) {
+            throw new DataAccessException("Invalid data");
+        }
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         String hashedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         executeUpdate(statement, userData.username(), hashedPassword, userData.email());
@@ -78,11 +79,15 @@ public class MySQLUserDAO implements UserDAO {
         executeUpdate(statement);
     }
 
-    public UserData readUser(ResultSet rs) throws SQLException {
-        String username = rs.getString("username");
-        String password = rs.getString("password");
-        String email = rs.getString("email");
-        return new UserData(username, password, email);
+    public UserData readUser(ResultSet rs) throws DataAccessException {
+        try {
+            String username = rs.getString("username");
+            String password = rs.getString("password");
+            String email = rs.getString("email");
+            return new UserData(username, password, email);
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
     }
 
 }
