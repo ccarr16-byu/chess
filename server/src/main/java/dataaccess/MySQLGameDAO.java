@@ -39,7 +39,8 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public GameData getGame(int id) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameState FROM games WHERE gameID=?";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, " +
+                    "gameState FROM games WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, id);
                 try (var rs = ps.executeQuery()) {
@@ -75,7 +76,8 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public void updateGame(int id, GameData updatedGame) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameState FROM games WHERE gameID=?";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, " +
+                    "gameState FROM games WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, id);
                 try (var rs = ps.executeQuery()) {

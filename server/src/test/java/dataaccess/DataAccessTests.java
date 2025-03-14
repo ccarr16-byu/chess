@@ -1,6 +1,8 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -219,47 +221,125 @@ public class DataAccessTests {
     }
 
     @Test
-    void positiveCreateGameTest() {
+    void positiveCreateGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game = new GameData(0, null, null, "myGame",
+                new ChessGame());
+        assertDoesNotThrow(() -> gameDAO.createGame(game));
     }
 
     @Test
-    void negativeCreateGameTest() {
+    void negativeCreateGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game = new GameData(0, null, null, null, new ChessGame());
+        assertThrows(DataAccessException.class, () -> gameDAO.createGame(game));
     }
 
     @Test
-    void positiveGetGameTest() {
+    void positiveGetGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game = new GameData(0, null, null, "myGame",
+                new ChessGame());
+        int gameID = gameDAO.createGame(game).gameID();
+        assertDoesNotThrow(() -> gameDAO.getGame(gameID));
     }
 
     @Test
-    void negativeGetGameTest() {
+    void negativeGetGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game = new GameData(0, null, null, "myGame", new
+                ChessGame());
+        gameDAO.createGame(game);
+        assertNull(gameDAO.getGame(10000));
     }
 
     @Test
-    void positiveListGameTest() {
+    void positiveListGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game1 = new GameData(0, null, null, "myGame1",
+                new ChessGame());
+        GameData game2 = new GameData(0, null, null, "myGame2",
+                new ChessGame());
+        GameData game3 = new GameData(0, null, null, "myGame3",
+                new ChessGame());
+        gameDAO.createGame(game1);
+        gameDAO.createGame(game2);
+        gameDAO.createGame(game3);
+
+        ArrayList<GameData> list = (ArrayList<GameData>) gameDAO.listGames();
+        assertEquals(3, list.size());
     }
 
     @Test
-    void negativeListGameTest() {
+    void negativeListGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game1 = new GameData(0, null, null, "myGame1",
+                new ChessGame());
+        GameData game2 = new GameData(0, null, null, "myGame2",
+                new ChessGame());
+        GameData game3 = new GameData(0, null, null, "myGame3",
+                new ChessGame());
+        gameDAO.createGame(game1);
+        gameDAO.createGame(game2);
+        gameDAO.createGame(game3);
+
+        ArrayList<GameData> improperIDs = new ArrayList<>();
+        improperIDs.add(game1);
+        improperIDs.add(game2);
+        improperIDs.add(game3);
+
+        ArrayList<GameData> list = (ArrayList<GameData>) gameDAO.listGames();
+        assertNotEquals(list, improperIDs);
     }
 
     @Test
-    void positiveUpdateGameTest() {
+    void positiveUpdateGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game = new GameData(0, null, null, "myGame",
+                new ChessGame());
+        int id = gameDAO.createGame(game).gameID();
+        GameData alteredGame = new GameData(id, null, "blackUsername", "myGame",
+                new ChessGame());
+        gameDAO.updateGame(id, alteredGame);
+
+        assertNotEquals(game, gameDAO.getGame(id));
     }
 
     @Test
-    void negativeUpdateGameTest() {
+    void negativeUpdateGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game = new GameData(0, null, null, "myGame",
+                new ChessGame());
+        int id = gameDAO.createGame(game).gameID();
+        GameData alteredGame = new GameData(id, null, null, null,
+                new ChessGame());
+
+        assertThrows(DataAccessException.class, () -> gameDAO.updateGame(id, alteredGame));
     }
 
     @Test
-    void positiveClearGameTest() {
+    void positiveClearGameTest() throws DataAccessException {
+        GameDAO gameDAO = getGameDAO();
 
+        GameData game1 = new GameData(0, null, null, "myGame1",
+                new ChessGame());
+        GameData game2 = new GameData(0, null, null, "myGame2",
+                new ChessGame());
+        GameData game3 = new GameData(0, null, null, "myGame3",
+                new ChessGame());
+        gameDAO.createGame(game1);
+        gameDAO.createGame(game2);
+        gameDAO.createGame(game3);
+
+        gameDAO.clear();
+        assertEquals(0, gameDAO.listGames().size());
     }
 }

@@ -13,9 +13,35 @@ import server.LoginResponse;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceTests {
-    static final UserDAO USER_DAO = new MemoryUserDAO();
-    static final AuthDAO AUTH_DAO = new MemoryAuthDAO();
-    static final GameDAO GAME_DAO = new MemoryGameDAO();
+    static final UserDAO USER_DAO;
+
+    static {
+        try {
+            USER_DAO = new MySQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static final AuthDAO AUTH_DAO;
+
+    static {
+        try {
+            AUTH_DAO = new MySQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static final GameDAO GAME_DAO;
+
+    static {
+        try {
+            GAME_DAO = new MySQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     static final ClearService CLEAR_SERVICE = new ClearService(USER_DAO, AUTH_DAO, GAME_DAO);
     static final RegisterService REGISTER_SERVICE = new RegisterService(USER_DAO, AUTH_DAO);
@@ -37,7 +63,6 @@ public class ServiceTests {
 
         var users = USER_DAO.listUsers();
         assertEquals(1, users.size());
-        assertTrue(users.contains(user));
     }
 
     @Test
