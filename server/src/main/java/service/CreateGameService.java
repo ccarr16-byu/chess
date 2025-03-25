@@ -5,8 +5,8 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.GameData;
-import server.CreateGameRequest;
-import server.CreateGameResponse;
+import model.CreateGameRequest;
+import model.CreateGameResponse;
 
 public class CreateGameService {
     private final GameDAO gameDAO;

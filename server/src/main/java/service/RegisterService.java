@@ -5,7 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
-import server.LoginResponse;
+import model.LoginResponse;
 
 
 public class RegisterService {

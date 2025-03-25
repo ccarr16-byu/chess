@@ -3,7 +3,7 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import server.ListGamesResponse;
+import model.ListGamesResponse;
 
 public class ListGamesService {
     private final GameDAO gameDAO;

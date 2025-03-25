@@ -5,10 +5,10 @@ import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.CreateGameRequest;
-import server.JoinGameRequest;
-import server.LoginRequest;
-import server.LoginResponse;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
+import model.LoginRequest;
+import model.LoginResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 

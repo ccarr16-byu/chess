@@ -5,10 +5,8 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import org.mindrot.jbcrypt.BCrypt;
-import server.LoginRequest;
-import server.LoginResponse;
-
-import java.util.Objects;
+import model.LoginRequest;
+import model.LoginResponse;
 
 public class LoginService {
     private final UserDAO userDAO;
