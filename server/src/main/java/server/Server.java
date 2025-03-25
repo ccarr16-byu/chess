@@ -108,7 +108,6 @@ public class Server {
         } catch (Exception e) {
             return unexpectedError(e, response);
         }
-
     }
 
     private Object logout(Request request, Response response) {
