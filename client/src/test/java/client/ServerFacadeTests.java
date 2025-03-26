@@ -53,4 +53,12 @@ public class ServerFacadeTests {
         serverFacade.register(userData);
         assertThrows(ResponseException.class, () -> serverFacade.register(userData));
     }
+
+    @Test
+    public void positiveLogoutTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        String authToken = serverFacade.register(userData).authToken();
+        serverFacade.logout(authToken);
+        assertThrows(ResponseException.class, () -> serverFacade.logout(authToken));
+    }
 }
