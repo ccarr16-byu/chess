@@ -76,4 +76,10 @@ public class ServerFacadeTests {
         var loginRequest = new LoginRequest(userData.username(), userData.password());
         assertDoesNotThrow(() -> serverFacade.login(loginRequest));
     }
+
+    @Test
+    public void negativeLoginTest() throws ResponseException {
+        var loginRequest = new LoginRequest("fake-user", "fake-password");
+        assertThrows(ResponseException.class, () -> serverFacade.login(loginRequest));
+    }
 }
