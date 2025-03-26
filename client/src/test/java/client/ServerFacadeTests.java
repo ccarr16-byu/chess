@@ -25,6 +25,9 @@ public class ServerFacadeTests {
         serverFacade = new ServerFacade(serverUrl);
     }
 
+    @BeforeEach
+    void clearServer() throws ResponseException { serverFacade.clear(); }
+
     @AfterAll
     static void stopServer() {
         server.stop();
