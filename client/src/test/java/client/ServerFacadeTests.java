@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import Server.ServerFacade;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
@@ -36,4 +37,11 @@ public class ServerFacadeTests {
         assertNotNull(registerResponse.authToken());
     }
 
+    @Test
+    public void positiveClearTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        serverFacade.register(userData);
+        serverFacade.clear();
+        assertDoesNotThrow(() -> serverFacade.register(userData));
+    }
 }
