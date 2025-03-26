@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.LoginRequest;
 import model.LoginResponse;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -65,5 +66,14 @@ public class ServerFacadeTests {
     @Test
     public void negativeLogoutTest() throws ResponseException {
         assertThrows(ResponseException.class, () -> serverFacade.logout("not-an-auth"));
+    }
+
+    @Test
+    public void positiveLoginTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        String authToken = serverFacade.register(userData).authToken();
+        serverFacade.logout(authToken);
+        var loginRequest = new LoginRequest(userData.username(), userData.password());
+        assertDoesNotThrow(() -> serverFacade.login(loginRequest));
     }
 }
