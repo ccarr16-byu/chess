@@ -119,4 +119,13 @@ public class ServerFacadeTests {
         var joinGameRequest = new JoinGameRequest(ChessGame.TeamColor.BLACK, gameID);
         assertDoesNotThrow(() -> serverFacade.joinGame(joinGameRequest, authToken));
     }
+
+    @Test
+    public void negativeJoinGameTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        String authToken = serverFacade.register(userData).authToken();
+        int badID = 10000;
+        var joinGameRequest = new JoinGameRequest(ChessGame.TeamColor.BLACK, badID);
+        assertThrows(ResponseException.class, () -> serverFacade.joinGame(joinGameRequest, authToken));
+    }
 }
