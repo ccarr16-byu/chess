@@ -7,8 +7,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import Server.ServerFacade;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -46,5 +45,12 @@ public class ServerFacadeTests {
         serverFacade.register(userData);
         serverFacade.clear();
         assertDoesNotThrow(() -> serverFacade.register(userData));
+    }
+
+    @Test
+    public void negativeRegisterTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        serverFacade.register(userData);
+        assertThrows(ResponseException.class, () -> serverFacade.register(userData));
     }
 }
