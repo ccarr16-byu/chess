@@ -106,4 +106,9 @@ public class ServerFacadeTests {
         serverFacade.createGame(createGameRequest, authToken);
         assertEquals(1, serverFacade.listGames(authToken).games().size());
     }
+
+    @Test
+    public void negativeListGameTest() {
+        assertThrows(ResponseException.class, () -> serverFacade.listGames("bad-auth"));
+    }
 }
