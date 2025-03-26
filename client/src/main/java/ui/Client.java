@@ -30,12 +30,51 @@ public class Client {
         }
     }
 
+    public String postLoginEval(String input) {
+        try {
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "create" -> createGame(params);
+                case "list" -> listGames(params);
+                case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
+                case "logout" -> logout(params);
+                case "quit" -> "quit";
+                default -> help();
+            };
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
+    }
+
     public String login(String... params) throws ResponseException {
         return "login";
     }
 
     public String register(String... params) throws ResponseException {
         return "register";
+    }
+
+    public String createGame(String... params) throws ResponseException {
+        return "createGame";
+    }
+
+    public String listGames(String... params) throws ResponseException {
+        return "listGames";
+    }
+
+    public String joinGame(String... params) throws ResponseException {
+        return "joinGame";
+    }
+
+    public String observeGame(String... params) throws ResponseException {
+        return "observeGame";
+    }
+
+    public String logout(String... params) throws ResponseException {
+        return "logout";
     }
 
     public String help() {
