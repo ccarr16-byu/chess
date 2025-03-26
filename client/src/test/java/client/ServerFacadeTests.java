@@ -97,4 +97,13 @@ public class ServerFacadeTests {
         var createGameRequest = new CreateGameRequest("gameName");
         assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest, "bad-auth"));
     }
+
+    @Test
+    public void positiveListGameTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        String authToken = serverFacade.register(userData).authToken();
+        var createGameRequest = new CreateGameRequest("gameName");
+        serverFacade.createGame(createGameRequest, authToken);
+        assertEquals(1, serverFacade.listGames(authToken).games().size());
+    }
 }
