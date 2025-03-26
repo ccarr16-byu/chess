@@ -65,7 +65,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void negativeLogoutTest() throws ResponseException {
+    public void negativeLogoutTest() {
         assertThrows(ResponseException.class, () -> serverFacade.logout("not-an-auth"));
     }
 
@@ -79,7 +79,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void negativeLoginTest() throws ResponseException {
+    public void negativeLoginTest() {
         var loginRequest = new LoginRequest("fake-user", "fake-password");
         assertThrows(ResponseException.class, () -> serverFacade.login(loginRequest));
     }
@@ -90,5 +90,11 @@ public class ServerFacadeTests {
         String authToken = serverFacade.register(userData).authToken();
         var createGameRequest = new CreateGameRequest("gameName");
         assertDoesNotThrow(() -> serverFacade.createGame(createGameRequest, authToken));
+    }
+
+    @Test
+    public void negativeCreateGameTest() {
+        var createGameRequest = new CreateGameRequest("gameName");
+        assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest, "bad-auth"));
     }
 }
