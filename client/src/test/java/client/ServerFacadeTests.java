@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.CreateGameRequest;
 import model.LoginRequest;
 import model.LoginResponse;
 import model.UserData;
@@ -81,5 +82,13 @@ public class ServerFacadeTests {
     public void negativeLoginTest() throws ResponseException {
         var loginRequest = new LoginRequest("fake-user", "fake-password");
         assertThrows(ResponseException.class, () -> serverFacade.login(loginRequest));
+    }
+
+    @Test
+    public void positiveCreateGameTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        String authToken = serverFacade.register(userData).authToken();
+        var createGameRequest = new CreateGameRequest("gameName");
+        assertDoesNotThrow(() -> serverFacade.createGame(createGameRequest, authToken));
     }
 }
