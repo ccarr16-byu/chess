@@ -1,10 +1,8 @@
 package client;
 
+import chess.ChessGame;
 import exception.ResponseException;
-import model.CreateGameRequest;
-import model.LoginRequest;
-import model.LoginResponse;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import Server.ServerFacade;
@@ -110,5 +108,15 @@ public class ServerFacadeTests {
     @Test
     public void negativeListGameTest() {
         assertThrows(ResponseException.class, () -> serverFacade.listGames("bad-auth"));
+    }
+
+    @Test
+    public void positiveJoinGameTest() throws ResponseException {
+        UserData userData = new UserData("username", "password", "email");
+        String authToken = serverFacade.register(userData).authToken();
+        var createGameRequest = new CreateGameRequest("gameName");
+        int gameID = serverFacade.createGame(createGameRequest, authToken).gameID();
+        var joinGameRequest = new JoinGameRequest(ChessGame.TeamColor.BLACK, gameID);
+        assertDoesNotThrow(() -> serverFacade.joinGame(joinGameRequest, authToken));
     }
 }
