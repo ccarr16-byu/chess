@@ -8,10 +8,21 @@ import exception.ResponseException;
 public class Client {
     private final ServerFacade server;
     private final String serverUrl;
+    private int state = 0;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+    }
+
+    public String eval(String input) {
+        if (state == 0) {
+            return preLoginEval(input);
+        } else if (state == 1) {
+            return postLoginEval(input);
+        } else {
+            return "Game UI";
+        }
     }
 
     public String preLoginEval(String input) {
