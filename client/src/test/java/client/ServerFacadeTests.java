@@ -61,4 +61,9 @@ public class ServerFacadeTests {
         serverFacade.logout(authToken);
         assertThrows(ResponseException.class, () -> serverFacade.logout(authToken));
     }
+
+    @Test
+    public void negativeLogoutTest() throws ResponseException {
+        assertThrows(ResponseException.class, () -> serverFacade.logout("not-an-auth"));
+    }
 }
