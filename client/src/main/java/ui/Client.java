@@ -185,7 +185,8 @@ public class Client {
             } catch (ResponseException ex) {
                 return "Unable to join game.";
             }
-            return String.format("Successfully joined game '%s'.\n", game.gameName()) + drawBoard(team);
+            ChessBoardUI.drawChessBoard(team);
+            return String.format("Successfully joined game '%s'.\n", game.gameName());
         } else {
             return "Missing parameters.";
         }
@@ -194,7 +195,8 @@ public class Client {
     public String observeGame(String... params) throws ResponseException {
         if (params.length >= 1) {
             int gameNumber = Integer.parseInt(params[0]);
-            return drawBoard(ChessGame.TeamColor.WHITE);
+            ChessBoardUI.drawChessBoard(ChessGame.TeamColor.WHITE);
+            return "Game drawn.";
         } else {
             return "Missing parameters.";
         }
@@ -213,10 +215,6 @@ public class Client {
         } else {
             return "Not logged in.";
         }
-    }
-
-    public String drawBoard(ChessGame.TeamColor team) {
-        return "DrawBoard placeholder";
     }
 
     public String help() {
