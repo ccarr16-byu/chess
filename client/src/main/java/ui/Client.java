@@ -192,7 +192,12 @@ public class Client {
     }
 
     public String observeGame(String... params) throws ResponseException {
-        return "observeGame";
+        if (params.length >= 1) {
+            int gameNumber = Integer.parseInt(params[0]);
+            return drawBoard(ChessGame.TeamColor.WHITE);
+        } else {
+            return "Missing parameters.";
+        }
     }
 
     public String logout() throws ResponseException {
@@ -226,7 +231,7 @@ public class Client {
             return """
                     create <GAME NAME>\u001b[38;5;242m - to create an game
                     \u001b[38;5;12mlist\u001b[38;5;242m - to see available games
-                    \u001b[38;5;12mjoin <GAME ID> <COLOR>\u001b[38;5;242m - join a game
+                    \u001b[38;5;12mjoin <GAME ID> [WHITE|BLACK]\u001b[38;5;242m - join a game
                     \u001b[38;5;12mobserve <GAME ID>\u001b[38;5;242m - watch a game
                     \u001b[38;5;12mlogout\u001b[38;5;242m - back to menu
                     \u001b[38;5;12mquit\u001b[38;5;242m - done playing chess
