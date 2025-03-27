@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import Server.ServerFacade;
 import exception.ResponseException;
+import model.CreateGameRequest;
 import model.LoginRequest;
 import model.LoginResponse;
 import model.UserData;
@@ -110,7 +111,17 @@ public class Client {
     }
 
     public String createGame(String... params) throws ResponseException {
-        return "createGame";
+        if (params.length >= 1) {
+            var createGameRequest = new CreateGameRequest(params[0]);
+            try {
+                server.createGame(createGameRequest, this.authToken);
+            } catch (ResponseException ex) {
+                return "Game creation not successful.";
+            }
+            return String.format("Successfully created game '%s'.", createGameRequest.gameName());
+        } else {
+            return "Missing parameters.";
+        }
     }
 
     public String listGames(String... params) throws ResponseException {
