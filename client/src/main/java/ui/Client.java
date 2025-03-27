@@ -1,19 +1,18 @@
 package ui;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import Server.ServerFacade;
 import exception.ResponseException;
-import model.CreateGameRequest;
-import model.LoginRequest;
-import model.LoginResponse;
-import model.UserData;
+import model.*;
 
 public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     public int state = 0;
     private String authToken;
+    private HashMap<Integer, String> gameMap;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -53,7 +52,7 @@ public class Client {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "create" -> createGame(params);
-                case "list" -> listGames(params);
+                case "list" -> listGames();
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
                 case "logout" -> logout();
@@ -124,8 +123,27 @@ public class Client {
         }
     }
 
-    public String listGames(String... params) throws ResponseException {
-        return "listGames";
+    public String listGames() throws ResponseException {
+        ListGamesResponse listGamesResponse;
+        try {
+            listGamesResponse = server.listGames(this.authToken);
+        } catch (ResponseException ex) {
+            return "Unable to list games.";
+        }
+        var gamesList = listGamesResponse.games();
+        if (gamesList.isEmpty()) {
+            return "No games to list.";
+        } else {
+            int counter = 1;
+            this.gameMap = new HashMap<>();
+            StringBuilder returnString = new StringBuilder();
+            for (var game : gamesList) {
+                returnString.append(String.format("%d: %s\n", counter, game.gameName()));
+                gameMap.put(counter, game.gameName());
+                counter++;
+            }
+            return returnString.toString();
+        }
     }
 
     public String joinGame(String... params) throws ResponseException {
