@@ -11,8 +11,8 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("♔ Welcome to chess.");
-        System.out.print(client.help());
+        System.out.println(SET_TEXT_COLOR_GREEN + "♔ Welcome to Chess ♕");
+        System.out.print(SET_TEXT_COLOR_BLUE + client.help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -32,6 +32,12 @@ public class Repl {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+        String stateMessage;
+        if (client.state == 0) {
+            stateMessage = "[Logged Out]";
+        } else {
+            stateMessage = "[Logged In]";
+        }
+        System.out.print("\n" + SET_TEXT_COLOR_MAGENTA + stateMessage + RESET_TEXT_COLOR + " >>> " + SET_TEXT_COLOR_GREEN);
     }
 }
