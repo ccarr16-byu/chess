@@ -4,12 +4,15 @@ import java.util.Arrays;
 
 import Server.ServerFacade;
 import exception.ResponseException;
+import model.LoginRequest;
+import model.LoginResponse;
 import model.UserData;
 
 public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     public int state = 0;
+    private String authToken;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -52,7 +55,7 @@ public class Client {
                 case "list" -> listGames(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
-                case "logout" -> logout(params);
+                case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -62,7 +65,25 @@ public class Client {
     }
 
     public String login(String... params) throws ResponseException {
-        return "login";
+        if (params.length >= 2) {
+            var username = params[0];
+            var password = params[1];
+            String returnedUsername;
+            String returnedAuthToken;
+            try {
+                var loginRequest = new LoginRequest(username, password);
+                LoginResponse loginResponse = server.login(loginRequest);
+                returnedUsername = loginResponse.username();
+                returnedAuthToken = loginResponse.authToken();
+            } catch (ResponseException ex) {
+                return "Login not successful.";
+            }
+            this.state = 1;
+            this.authToken = returnedAuthToken;
+            return String.format("Successfully logged in as %s.", returnedUsername);
+        } else {
+            return "Missing parameters.";
+        }
     }
 
     public String register(String... params) throws ResponseException {
@@ -71,14 +92,18 @@ public class Client {
             var password = params[1];
             var email = params[2];
             String returnedUsername;
+            String returnedAuthToken;
             try {
                 var userData = new UserData(username, password, email);
-                returnedUsername = server.register(userData).username();
+                LoginResponse registerResponse = server.register(userData);
+                returnedUsername = registerResponse.username();
+                returnedAuthToken = registerResponse.authToken();
             } catch (ResponseException ex) {
                 return "Registration not successful.";
             }
             this.state = 1;
-            return String.format("Successfully signed in as %s.", returnedUsername);
+            this.authToken = returnedAuthToken;
+            return String.format("Successfully logged in as %s.", returnedUsername);
         } else {
             return "Missing parameters.";
         }
@@ -100,8 +125,19 @@ public class Client {
         return "observeGame";
     }
 
-    public String logout(String... params) throws ResponseException {
-        return "logout";
+    public String logout() throws ResponseException {
+        if (state != 0) {
+            try {
+                server.logout(this.authToken);
+            } catch (ResponseException ex) {
+                return "Logout not successful.";
+            }
+            state = 0;
+            this.authToken = "";
+            return "Successfully logged out.";
+        } else {
+            return "Not logged in.";
+        }
     }
 
     public String help() {
