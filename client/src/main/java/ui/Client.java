@@ -2,8 +2,10 @@ package ui;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 import Server.ServerFacade;
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 
@@ -12,7 +14,7 @@ public class Client {
     private final String serverUrl;
     public int state = 0;
     private String authToken;
-    private HashMap<Integer, String> gameMap;
+    private HashMap<Integer, GameData> gameMap;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -138,8 +140,21 @@ public class Client {
             this.gameMap = new HashMap<>();
             StringBuilder returnString = new StringBuilder();
             for (var game : gamesList) {
-                returnString.append(String.format("%d: %s\n", counter, game.gameName()));
-                gameMap.put(counter, game.gameName());
+                String whiteUsername;
+                String blackUsername;
+                if (game.whiteUsername() == null) {
+                    whiteUsername = "Not taken";
+                } else {
+                    whiteUsername = game.whiteUsername();
+                }
+                if (game.blackUsername() == null) {
+                    blackUsername = "Not taken";
+                } else {
+                    blackUsername = game.blackUsername();
+                }
+                returnString.append(String.format("%d: %s - White: %s, Black: %s\n", counter, game.gameName(),
+                        whiteUsername, blackUsername));
+                gameMap.put(counter, game);
                 counter++;
             }
             return returnString.toString();
@@ -147,7 +162,33 @@ public class Client {
     }
 
     public String joinGame(String... params) throws ResponseException {
-        return "joinGame";
+        if (params.length >= 2) {
+            int gameNumber = Integer.parseInt(params[0]);
+            ChessGame.TeamColor team;
+            if (Objects.equals(params[1], "white")) {
+                team = ChessGame.TeamColor.WHITE;
+            } else if (Objects.equals(params[1], "black")) {
+                team = ChessGame.TeamColor.BLACK;
+            } else {
+                return "Invalid team color.";
+            }
+            if (this.gameMap == null) {
+                return "List games first.";
+            }
+            GameData game = this.gameMap.getOrDefault(gameNumber, null);
+            if (game == null) {
+                return "Invalid game number.";
+            }
+            var joinGameRequest = new JoinGameRequest(team, game.gameID());
+            try {
+                server.joinGame(joinGameRequest, this.authToken);
+            } catch (ResponseException ex) {
+                return "Unable to join game.";
+            }
+            return String.format("Successfully joined game '%s'.\n", game.gameName()) + drawBoard(team);
+        } else {
+            return "Missing parameters.";
+        }
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -167,6 +208,10 @@ public class Client {
         } else {
             return "Not logged in.";
         }
+    }
+
+    public String drawBoard(ChessGame.TeamColor team) {
+        return "DrawBoard placeholder";
     }
 
     public String help() {
