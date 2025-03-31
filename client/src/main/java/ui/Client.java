@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
-import Server.ServerFacade;
+import server.ServerFacade;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
@@ -163,7 +163,12 @@ public class Client {
 
     public String joinGame(String... params) throws ResponseException {
         if (params.length >= 2) {
-            int gameNumber = Integer.parseInt(params[0]);
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (NumberFormatException ex) {
+                return "Invalid game number.";
+            }
             ChessGame.TeamColor team;
             if (Objects.equals(params[1], "white")) {
                 team = ChessGame.TeamColor.WHITE;
@@ -194,7 +199,18 @@ public class Client {
 
     public String observeGame(String... params) throws ResponseException {
         if (params.length >= 1) {
-            int gameNumber = Integer.parseInt(params[0]);
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (NumberFormatException ex) {
+                return "Invalid game number.";
+            }
+            if (this.gameMap == null) {
+                return "List games first.";
+            }
+            if (gameMap.get(gameNumber) == null) {
+                return "Invalid game number.";
+            }
             ChessBoardUI.drawChessBoard(ChessGame.TeamColor.WHITE);
             return "Game drawn.";
         } else {

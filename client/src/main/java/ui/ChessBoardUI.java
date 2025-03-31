@@ -155,9 +155,9 @@ public class ChessBoardUI {
         int postfixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
         int row;
         if (team == ChessGame.TeamColor.WHITE) {
-            row = i;
-        } else {
             row = 9 - i;
+        } else {
+            row = i;
         }
         String header = " " + Integer.toString(row) + "\u2003";
         return EMPTY.repeat(prefixLength) + header + EMPTY.repeat(postfixLength);

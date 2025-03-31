@@ -1,8 +1,6 @@
-package Server;
+package server;
 
 import com.google.gson.Gson;
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.Request;
 import exception.ResponseException;
 import model.*;
 

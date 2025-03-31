@@ -5,7 +5,7 @@ import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
-import Server.ServerFacade;
+import server.ServerFacade;
 
 import static org.junit.jupiter.api.Assertions.*;
 
