@@ -27,7 +27,7 @@ public class Client {
         } else if (state == 1) {
             return postLoginEval(input);
         } else {
-            return "Game UI";
+            return inGameEval(input);
         }
     }
 
@@ -59,6 +59,24 @@ public class Client {
                 case "observe" -> observeGame(params);
                 case "logout" -> logout();
                 case "quit" -> "quit";
+                default -> help();
+            };
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String inGameEval(String input) {
+        try {
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "move" -> move();
+                case "resign" -> resign();
+                case "highlight" -> highlight();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -191,6 +209,7 @@ public class Client {
                 return "Unable to join game.";
             }
             ChessBoardUI.drawChessBoard(team);
+            this.state = 2;
             return String.format("Successfully joined game '%s'.\n", game.gameName());
         } else {
             return "Missing parameters.";
@@ -233,6 +252,26 @@ public class Client {
         }
     }
 
+    public String redraw() throws ResponseException {
+        return "redraw placeholder";
+    }
+
+    public String leave() throws ResponseException {
+        return "leave placeholder";
+    }
+
+    public String move() throws ResponseException {
+        return "move placeholder";
+    }
+
+    public String resign() throws ResponseException {
+        return "resign placeholder";
+    }
+
+    public String highlight() throws ResponseException {
+        return "highlight placeholder";
+    }
+
     public String help() {
         if (state == 0) {
             return """
@@ -252,7 +291,14 @@ public class Client {
                     \u001b[38;5;12mhelp\u001b[38;5;242m - list possible commands
                    """;
         } else {
-            return "Game UI instructions placeholder";
+            return """
+                    redraw\u001b[38;5;242m - redraw the chessboard
+                    \u001b[38;5;12mleave\u001b[38;5;242m - leave the game
+                    \u001b[38;5;12mmove <STARTING SQUARE> <ENDING SQUARE>\u001b[38;5;242m - make a move
+                    \u001b[38;5;12mresign\u001b[38;5;242m - forfeit the game
+                    \u001b[38;5;12mhighlight <PIECE LOCATION>\u001b[38;5;242m - highlight valid a piece's moves
+                    \u001b[38;5;12mhelp\u001b[38;5;242m - list possible commands
+                   """;
         }
     }
 }
