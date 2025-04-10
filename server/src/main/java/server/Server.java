@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 import spark.*;
 
@@ -26,6 +27,7 @@ public class Server {
     private final ListGamesService listGamesService;
     private final CreateGameService createGameService;
     private final JoinGameService joinGameService;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         try {
@@ -38,6 +40,7 @@ public class Server {
             this.listGamesService = new ListGamesService(gameDAO, authDAO);
             this.createGameService = new CreateGameService(gameDAO, authDAO);
             this.joinGameService = new JoinGameService(gameDAO, authDAO);
+            this.webSocketHandler = new WebSocketHandler();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -47,6 +50,8 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
