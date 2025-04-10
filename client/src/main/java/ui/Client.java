@@ -8,17 +8,22 @@ import server.ServerFacade;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 public class Client {
     private final ServerFacade server;
+    private final NotificationHandler notificationHandler;
     private final String serverUrl;
+    private WebSocketFacade ws;
     public int state = 0;
     private String authToken;
     private HashMap<Integer, GameData> gameMap;
 
-    public Client(String serverUrl) {
+    public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
     }
 
     public String eval(String input) {
@@ -208,6 +213,8 @@ public class Client {
             } catch (ResponseException ex) {
                 return "Unable to join game.";
             }
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            
             ChessBoardUI.drawChessBoard(team);
             this.state = 2;
             return String.format("Successfully joined game '%s'.\n", game.gameName());
