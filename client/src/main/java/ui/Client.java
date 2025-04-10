@@ -214,7 +214,7 @@ public class Client {
                 return "Unable to join game.";
             }
             ws = new WebSocketFacade(serverUrl, notificationHandler);
-            
+            ws.connect(this.authToken, game.gameID());
             ChessBoardUI.drawChessBoard(team);
             this.state = 2;
             return String.format("Successfully joined game '%s'.\n", game.gameName());
