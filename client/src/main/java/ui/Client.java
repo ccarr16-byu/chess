@@ -21,6 +21,7 @@ public class Client {
     public int state = 0;
     private String authToken;
     private HashMap<Integer, GameData> gameMap;
+    public int currentGame;
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -33,6 +34,8 @@ public class Client {
             return preLoginEval(input);
         } else if (state == 1) {
             return postLoginEval(input);
+        } else if (state == 2) {
+            return observationEval(input);
         } else {
             return inGameEval(input);
         }
@@ -66,6 +69,22 @@ public class Client {
                 case "observe" -> observeGame(params);
                 case "logout" -> logout();
                 case "quit" -> "quit";
+                default -> help();
+            };
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
+    }
+
+    public String observationEval(String input) {
+        try {
+            var tokens = input.toLowerCase().split(" ");
+            var cmd = (tokens.length > 0) ? tokens[0] : "help";
+            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "leave" -> leave();
+                case "redraw" -> redraw();
+                case "highlight" -> highlight();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -217,8 +236,9 @@ public class Client {
             }
             ws = new WebSocketFacade(serverUrl, notificationHandler);
             ws.connect(this.authToken, game.gameID());
+            this.currentGame = game.gameID();
             ChessBoardUI.drawChessBoard(team);
-            this.state = 2;
+            this.state = 3;
             return String.format("Successfully joined game '%s'.\n", game.gameName());
         } else {
             return "Missing parameters.";
@@ -236,9 +256,14 @@ public class Client {
             if (this.gameMap == null) {
                 return "List games first.";
             }
-            if (gameMap.get(gameNumber) == null) {
+            GameData game = this.gameMap.getOrDefault(gameNumber, null);
+            if (game == null) {
                 return "Invalid game number.";
             }
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            ws.connect(this.authToken, game.gameID());
+            this.currentGame = game.gameID();
+            this.state = 2;
             ChessBoardUI.drawChessBoard(WHITE);
             return "Game drawn.";
         } else {
@@ -247,7 +272,7 @@ public class Client {
     }
 
     public String logout() throws ResponseException {
-        if (state != 0) {
+        if (state == 1) {
             try {
                 server.logout(this.authToken);
             } catch (ResponseException ex) {
@@ -266,7 +291,13 @@ public class Client {
     }
 
     public String leave() throws ResponseException {
-        return "leave placeholder";
+        try {
+            ws.leave(this.authToken, currentGame);
+        } catch (ResponseException ex) {
+            return "Inavlid request.";
+        }
+        this.state = 1;
+        return "Left game.";
     }
 
     public String move() throws ResponseException {
@@ -297,6 +328,13 @@ public class Client {
                     \u001b[38;5;12mobserve <GAME ID>\u001b[38;5;242m - watch a game
                     \u001b[38;5;12mlogout\u001b[38;5;242m - back to menu
                     \u001b[38;5;12mquit\u001b[38;5;242m - done playing chess
+                    \u001b[38;5;12mhelp\u001b[38;5;242m - list possible commands
+                   """;
+        } else if (state == 2) {
+            return """
+                    redraw\u001b[38;5;242m - redraw the chessboard
+                    \u001b[38;5;12mleave\u001b[38;5;242m - leave the game
+                    \u001b[38;5;12mhighlight <PIECE LOCATION>\u001b[38;5;242m - highlight valid a piece's moves
                     \u001b[38;5;12mhelp\u001b[38;5;242m - list possible commands
                    """;
         } else {

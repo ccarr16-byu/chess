@@ -7,6 +7,8 @@ import dataaccess.GameDAO;
 import model.GameData;
 import model.JoinGameRequest;
 
+import java.util.Objects;
+
 public class JoinGameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
@@ -19,7 +21,10 @@ public class JoinGameService {
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
         if (authDAO.getAuth(authToken) != null) {
             GameData game = gameDAO.getGame(joinGameRequest.gameID());
-            if (joinGameRequest.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null) {
+            String username = authDAO.getAuth(authToken).username();
+            if (Objects.equals(game.whiteUsername(), username) || Objects.equals(game.blackUsername(), username)) {
+                throw new DataAccessException("403#Error: user already in game");
+            } else if (joinGameRequest.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null) {
                 throw new DataAccessException("403#Error: already taken");
             } else if (joinGameRequest.playerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null) {
                 throw new DataAccessException("403#Error: already taken");
@@ -32,7 +37,8 @@ public class JoinGameService {
         }
     }
 
-    private GameData addPlayer(String authToken, ChessGame.TeamColor playerColor, GameData game) throws DataAccessException {
+    private GameData addPlayer(String authToken, ChessGame.TeamColor playerColor, GameData game)
+            throws DataAccessException {
         String whiteUserName;
         String blackUserName;
         if (playerColor == ChessGame.TeamColor.WHITE) {
