@@ -11,6 +11,8 @@ import model.*;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 
+import static chess.ChessGame.TeamColor.WHITE;
+
 public class Client {
     private final ServerFacade server;
     private final NotificationHandler notificationHandler;
@@ -194,7 +196,7 @@ public class Client {
             }
             ChessGame.TeamColor team;
             if (Objects.equals(params[1], "white")) {
-                team = ChessGame.TeamColor.WHITE;
+                team = WHITE;
             } else if (Objects.equals(params[1], "black")) {
                 team = ChessGame.TeamColor.BLACK;
             } else {
@@ -237,7 +239,7 @@ public class Client {
             if (gameMap.get(gameNumber) == null) {
                 return "Invalid game number.";
             }
-            ChessBoardUI.drawChessBoard(ChessGame.TeamColor.WHITE);
+            ChessBoardUI.drawChessBoard(WHITE);
             return "Game drawn.";
         } else {
             return "Missing parameters.";

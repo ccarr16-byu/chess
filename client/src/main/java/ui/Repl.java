@@ -1,8 +1,9 @@
 package ui;
 
 import websocket.NotificationHandler;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
@@ -35,9 +36,18 @@ public class Repl implements NotificationHandler {
         System.out.println();
     }
 
-    public void notify(NotificationMessage notification) {
-        System.out.println(SET_TEXT_COLOR_RED + notification.message);
+    public void notify(NotificationMessage notificationMessage) {
+        System.out.println(SET_TEXT_COLOR_YELLOW + notificationMessage.message);
         printPrompt();
+    }
+
+    public void error(ErrorMessage errorMessage) {
+        System.out.println(SET_TEXT_COLOR_RED + errorMessage.errorMessage);
+        printPrompt();
+    }
+
+    public void loadGame(LoadGameMessage loadGameMessage) {
+
     }
 
     private void printPrompt() {

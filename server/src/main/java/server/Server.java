@@ -12,14 +12,16 @@ import java.lang.reflect.Field;
 public class Server {
 
 
-    private final GameDAO gameDAO;
+    public final GameDAO gameDAO;
     {
         try {
-            gameDAO = new MySQLGameDAO();
+            this.gameDAO = new MySQLGameDAO();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
+    public final AuthDAO authDAO;
+    public final UserDAO userDAO;
     private final ClearService clearService;
     private final RegisterService registerService;
     private final LoginService loginService;
@@ -31,8 +33,8 @@ public class Server {
 
     public Server() {
         try {
-            UserDAO userDAO = new MySQLUserDAO();
-            AuthDAO authDAO = new MySQLAuthDAO();
+            this.userDAO = new MySQLUserDAO();
+            this.authDAO = new MySQLAuthDAO();
             this.clearService = new ClearService(userDAO, authDAO, gameDAO);
             this.registerService = new RegisterService(userDAO, authDAO);
             this.loginService = new LoginService(userDAO, authDAO);
@@ -40,7 +42,7 @@ public class Server {
             this.listGamesService = new ListGamesService(gameDAO, authDAO);
             this.createGameService = new CreateGameService(gameDAO, authDAO);
             this.joinGameService = new JoinGameService(gameDAO, authDAO);
-            this.webSocketHandler = new WebSocketHandler();
+            this.webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
