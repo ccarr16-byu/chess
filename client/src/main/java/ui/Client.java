@@ -88,7 +88,7 @@ public class Client {
             return switch (cmd) {
                 case "leave" -> leave();
                 case "redraw" -> redraw();
-                case "highlight" -> highlight();
+                case "highlight" -> highlight(params);
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -419,6 +419,22 @@ public class Client {
 
     public ChessPosition parseSquare(String square) throws ResponseException {
         int row;
+        int col = getCol(square);
+        switch (square.charAt(1)) {
+            case '1' -> row = 1;
+            case '2' -> row = 2;
+            case '3' -> row = 3;
+            case '4' -> row = 4;
+            case '5' -> row = 5;
+            case '6' -> row = 6;
+            case '7' -> row = 7;
+            case '8' -> row = 8;
+            default -> throw new ResponseException(403, "Invalid square.");
+        }
+        return new ChessPosition(row, col);
+    }
+
+    private static int getCol(String square) throws ResponseException {
         int col;
         if (square.length() < 2) {
             throw new ResponseException(403, "Invalid square.");
@@ -434,18 +450,7 @@ public class Client {
             case 'h', 'H' -> col = 8;
             default -> throw new ResponseException(403,"Invalid square.");
         }
-        switch (square.charAt(1)) {
-            case '1' -> row = 1;
-            case '2' -> row = 2;
-            case '3' -> row = 3;
-            case '4' -> row = 4;
-            case '5' -> row = 5;
-            case '6' -> row = 6;
-            case '7' -> row = 7;
-            case '8' -> row = 8;
-            default -> throw new ResponseException(403, "Invalid square.");
-        }
-        return new ChessPosition(row, col);
+        return col;
     }
 
     public ChessPiece.PieceType parsePromotion(String promotion) throws ResponseException {
