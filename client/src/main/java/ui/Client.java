@@ -10,6 +10,7 @@ import exception.ResponseException;
 import model.*;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
+import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.WHITE;
 
@@ -342,6 +343,12 @@ public class Client {
     }
 
     public String resign() throws ResponseException {
+        System.out.println("Are you sure? (Y/N)");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        if (!line.equalsIgnoreCase("y")) {
+            return "Not resigned.";
+        }
         try {
             ws.resign(this.authToken, currentGame);
             currentGameState.setIsGameOver();
