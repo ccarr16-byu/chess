@@ -21,10 +21,7 @@ public class JoinGameService {
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
         if (authDAO.getAuth(authToken) != null) {
             GameData game = gameDAO.getGame(joinGameRequest.gameID());
-            String username = authDAO.getAuth(authToken).username();
-            if (Objects.equals(game.whiteUsername(), username) || Objects.equals(game.blackUsername(), username)) {
-                throw new DataAccessException("403#Error: user already in game");
-            } else if (joinGameRequest.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null) {
+            if (joinGameRequest.playerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null) {
                 throw new DataAccessException("403#Error: already taken");
             } else if (joinGameRequest.playerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null) {
                 throw new DataAccessException("403#Error: already taken");

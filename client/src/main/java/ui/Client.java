@@ -104,20 +104,8 @@ public class Client {
             return switch (cmd) {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
-                case "move" -> {
-                    if (currentGameState.getGameOver()) {
-                        yield "Game is over!";
-                    } else {
-                        yield move(params);
-                    }
-                }
-                case "resign" -> {
-                    if (currentGameState.getGameOver()) {
-                        yield "Game is over!";
-                    } else {
-                        yield resign();
-                    }
-                }
+                case "move" -> move(params);
+                case "resign" -> resign();
                 case "highlight" -> highlight(params);
                 default -> help();
             };
