@@ -25,42 +25,46 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
                                               ChessGame.TeamColor color) {
         List<ChessMove> moves = new ArrayList<>();
         for (int i = currentRow + 1; i < 9; i++) {
-            if (board.getPiece(new ChessPosition(i, currentColumn)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, currentColumn), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, currentColumn)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, currentColumn), null));
+            var potentialMove = isValidMove(board, position, i, currentColumn, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         for (int i = currentRow - 1; i > 0; i--) {
-            if (board.getPiece(new ChessPosition(i, currentColumn)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, currentColumn), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, currentColumn)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, currentColumn), null));
+            var potentialMove = isValidMove(board, position, i, currentColumn, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         for (int i = currentColumn + 1; i < 9; i++) {
-            if (board.getPiece(new ChessPosition(currentRow, i)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(currentRow, i), null));
-            } else {
-                if (board.getPiece(new ChessPosition(currentRow, i)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(currentRow, i), null));
+            var potentialMove = isValidMove(board, position, currentRow, i, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         for (int i = currentColumn - 1; i > 0; i--) {
-            if (board.getPiece(new ChessPosition(currentRow, i)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(currentRow, i), null));
-            } else {
-                if (board.getPiece(new ChessPosition(currentRow, i)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(currentRow, i), null));
+            var potentialMove = isValidMove(board, position, currentRow, i, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
@@ -71,45 +75,70 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
                                                    int currentColumn, ChessGame.TeamColor color) {
         List<ChessMove> moves = new ArrayList<>();
         for (int i = currentRow + 1, j = currentColumn + 1; i < 9 && j < 9; i++, j++) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
+            var potentialMove = isValidMove(board, position, i, j, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         for (int i = currentRow - 1, j = currentColumn - 1; i > 0 && j > 0; i--, j--) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
+            var potentialMove = isValidMove(board, position, i, j, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         for (int i = currentRow + 1, j = currentColumn - 1; i < 9 && j > 0; i++, j--) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
+            var potentialMove = isValidMove(board, position, i, j, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         for (int i = currentRow - 1, j = currentColumn + 1; i > 0 && j < 9; i--, j++) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
+            var potentialMove = isValidMove(board, position, i, j, color);
+            if (potentialMove != null) {
+                moves.add(potentialMove);
+                if (isKillingMove(board, potentialMove, color)) {
+                    break;
                 }
+            } else {
                 break;
             }
         }
         return moves;
+    }
+
+    public static ChessMove isValidMove(ChessBoard board, ChessPosition position, int row, int column,
+                                       ChessGame.TeamColor color) {
+        ChessMove move;
+        if ((board.getPiece(new ChessPosition(row, column)) == null) ||
+                (board.getPiece(new ChessPosition(row, column)).getTeamColor() != color)) {
+            move = new ChessMove(position, new ChessPosition(row, column), null);
+        } else {
+            move = null;
+        }
+        return move;
+    }
+
+    public static boolean isKillingMove(ChessBoard board, ChessMove move, ChessGame.TeamColor color) {
+        var endPosition = move.getEndPosition();
+        var endPiece = board.getPiece(endPosition);
+        if (endPiece == null) {
+            return false;
+        }
+        return board.getPiece(move.getEndPosition()).getTeamColor() != color;
     }
 }
