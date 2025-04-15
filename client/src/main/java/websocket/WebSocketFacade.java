@@ -1,5 +1,6 @@
 package websocket;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import websocket.commands.MakeMoveCommand;
@@ -71,7 +72,8 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, Integer gameID, ChessMove chessMove) throws ResponseException {
+    public void makeMove(String authToken, Integer gameID, ChessMove chessMove) throws ResponseException,
+            InvalidMoveException {
         try {
             var makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID,
                     chessMove);

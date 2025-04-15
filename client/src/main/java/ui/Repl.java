@@ -1,5 +1,8 @@
 package ui;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import websocket.NotificationHandler;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -47,7 +50,24 @@ public class Repl implements NotificationHandler {
     }
 
     public void loadGame(LoadGameMessage loadGameMessage) {
+        ChessGame.TeamColor team = client.currentTeam;
+        int method = loadGameMessage.method;
+        ChessGame game = loadGameMessage.game;
+        ChessMove lastMove = loadGameMessage.lastMove;
+        ChessPosition position = loadGameMessage.position;
 
+        client.currentGameState = game;
+        if (method == 1) {
+            client.lastMove = lastMove;
+        }
+
+        System.out.print("\n");
+        if (method == 2) {
+            ChessBoardUI.drawChessBoard(team, game.getBoard(), method, lastMove, position, game.validMoves(position));
+        } else {
+            ChessBoardUI.drawChessBoard(team, game.getBoard(), method, lastMove, position, null);
+        }
+        printPrompt();
     }
 
     private void printPrompt() {

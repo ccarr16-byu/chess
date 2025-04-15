@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
+import chess.*;
 import server.ServerFacade;
-import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import websocket.NotificationHandler;
@@ -22,6 +22,10 @@ public class Client {
     private String authToken;
     private HashMap<Integer, GameData> gameMap;
     public int currentGame;
+    public ChessGame.TeamColor currentTeam;
+    public ChessGame currentGameState;
+    public ChessMove lastMove;
+
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -100,9 +104,21 @@ public class Client {
             return switch (cmd) {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
-                case "move" -> move();
-                case "resign" -> resign();
-                case "highlight" -> highlight();
+                case "move" -> {
+                    if (currentGameState.getGameOver()) {
+                        yield "Game is over!";
+                    } else {
+                        yield move(params);
+                    }
+                }
+                case "resign" -> {
+                    if (currentGameState.getGameOver()) {
+                        yield "Game is over!";
+                    } else {
+                        yield resign();
+                    }
+                }
+                case "highlight" -> highlight(params);
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -236,8 +252,8 @@ public class Client {
             }
             ws = new WebSocketFacade(serverUrl, notificationHandler);
             ws.connect(this.authToken, game.gameID());
+            this.currentTeam = team;
             this.currentGame = game.gameID();
-            ChessBoardUI.drawChessBoard(team);
             this.state = 3;
             return String.format("Successfully joined game '%s'.\n", game.gameName());
         } else {
@@ -262,9 +278,9 @@ public class Client {
             }
             ws = new WebSocketFacade(serverUrl, notificationHandler);
             ws.connect(this.authToken, game.gameID());
+            this.currentTeam = WHITE;
             this.currentGame = game.gameID();
             this.state = 2;
-            ChessBoardUI.drawChessBoard(WHITE);
             return "Game drawn.";
         } else {
             return "Missing parameters.";
@@ -287,29 +303,81 @@ public class Client {
     }
 
     public String redraw() throws ResponseException {
-        return "redraw placeholder";
+        if (lastMove != null) {
+            ChessBoardUI.drawChessBoard(currentTeam, currentGameState.getBoard(), 1, lastMove, null,
+                    null);
+        } else {
+            ChessBoardUI.drawChessBoard(currentTeam, currentGameState.getBoard(), 0, null, null,
+                    null);
+        }
+        return "";
     }
 
     public String leave() throws ResponseException {
         try {
             ws.leave(this.authToken, currentGame);
         } catch (ResponseException ex) {
-            return "Inavlid request.";
+            return "Invalid request.";
         }
         this.state = 1;
         return "Left game.";
     }
 
-    public String move() throws ResponseException {
-        return "move placeholder";
+    public String move(String... params) throws ResponseException {
+        if (params.length >= 2) {
+            ChessPosition start;
+            ChessPosition end;
+            ChessPiece.PieceType promotionPiece;
+            ChessMove chessMove;
+            try {
+                start = parseSquare(params[0]);
+                end = parseSquare(params[1]);
+                if (params.length >= 3) {
+                    promotionPiece = parsePromotion(params[2]);
+                } else {
+                    promotionPiece = null;
+                }
+                chessMove = new ChessMove(start, end, promotionPiece);
+            } catch (ResponseException ex) {
+                return "Invalid parameters.";
+            }
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            try {
+                ws.makeMove(this.authToken, currentGame, chessMove);
+            } catch (Exception e) {
+                return "Invalid move.";
+            }
+            return "";
+        } else {
+            return "Missing parameters.";
+        }
     }
 
     public String resign() throws ResponseException {
-        return "resign placeholder";
+        try {
+            ws.resign(this.authToken, currentGame);
+            currentGameState.setIsGameOver();
+            return "Game resigned.";
+        } catch (ResponseException ex) {
+            return "Invalid request.";
+        }
     }
 
-    public String highlight() throws ResponseException {
-        return "highlight placeholder";
+    public String highlight(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            ChessPosition position;
+            try {
+                position = parseSquare(params[0]);
+            } catch (ResponseException ex) {
+                return "Invalid position.";
+            }
+            var validMoves = currentGameState.validMoves(position);
+            ChessBoardUI.drawChessBoard(currentTeam, currentGameState.getBoard(), 2, null, position,
+                    validMoves);
+        } else {
+            return "Missing parameters.";
+        }
+        return "";
     }
 
     public String help() {
@@ -347,5 +415,48 @@ public class Client {
                     \u001b[38;5;12mhelp\u001b[38;5;242m - list possible commands
                    """;
         }
+    }
+
+    public ChessPosition parseSquare(String square) throws ResponseException {
+        int row;
+        int col;
+        if (square.length() < 2) {
+            throw new ResponseException(403, "Invalid square.");
+        }
+        switch (square.charAt(0)) {
+            case 'a', 'A' -> col = 1;
+            case 'b', 'B' -> col = 2;
+            case 'c', 'C' -> col = 3;
+            case 'd', 'D' -> col = 4;
+            case 'e', 'E' -> col = 5;
+            case 'f', 'F' -> col = 6;
+            case 'g', 'G' -> col = 7;
+            case 'h', 'H' -> col = 8;
+            default -> throw new ResponseException(403,"Invalid square.");
+        }
+        switch (square.charAt(1)) {
+            case '1' -> row = 1;
+            case '2' -> row = 2;
+            case '3' -> row = 3;
+            case '4' -> row = 4;
+            case '5' -> row = 5;
+            case '6' -> row = 6;
+            case '7' -> row = 7;
+            case '8' -> row = 8;
+            default -> throw new ResponseException(403, "Invalid square.");
+        }
+        return new ChessPosition(row, col);
+    }
+
+    public ChessPiece.PieceType parsePromotion(String promotion) throws ResponseException {
+        ChessPiece.PieceType promotionPiece;
+        switch (promotion) {
+            case "q", "Q" -> promotionPiece = ChessPiece.PieceType.QUEEN;
+            case "r", "R" -> promotionPiece = ChessPiece.PieceType.ROOK;
+            case "b", "B" -> promotionPiece = ChessPiece.PieceType.BISHOP;
+            case "k", "K" -> promotionPiece = ChessPiece.PieceType.KNIGHT;
+            default -> throw new ResponseException(403, "Invalid promotion piece.");
+        }
+        return promotionPiece;
     }
 }

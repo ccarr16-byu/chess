@@ -1,5 +1,8 @@
 package server.websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ErrorMessage;
@@ -23,11 +26,41 @@ public class ConnectionHandler {
         connections.remove(authToken);
     }
 
-    public void loadGame(String authToken, Integer gameID) throws IOException {
+    public void sendError(String message, String authToken) throws IOException {
         var c = connections.get(authToken);
         if (c.session.isOpen()) {
-            var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
+            var errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            c.send(new Gson().toJson(errorMessage));
+        } else {
+            connections.remove(c.authToken);
+        }
+    }
+
+    public void loadGame(String authToken, ChessGame game, int method, ChessMove lastMove, ChessPosition position)
+            throws IOException {
+        var c = connections.get(authToken);
+        if (c.session.isOpen()) {
+            var loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, method,
+                    lastMove, position);
             c.send(new Gson().toJson(loadGameMessage));
+        } else {
+            connections.remove(c.authToken);
+        }
+    }
+
+    public void broadcastMove(ChessGame game, int method, ChessMove lastMove) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c: connections.values()) {
+            if (c.session.isOpen()) {
+                loadGame(c.authToken, game, method, lastMove, null);
+            } else {
+                removeList.add(c);
+            }
+        }
+
+        for (var c : removeList) {
+            connections.remove(c.authToken);
+
         }
     }
 

@@ -19,6 +19,7 @@ public class ChessGame {
     private ChessBoard board;
     private CastlingTracker castlingTracker;
     private EnPassantTracker enPassantTracker;
+    private Boolean isGameOver;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -26,6 +27,7 @@ public class ChessGame {
         teamTurn = TeamColor.WHITE;
         castlingTracker = new CastlingTracker();
         enPassantTracker = new EnPassantTracker();
+        isGameOver = Boolean.FALSE;
     }
 
     public ChessGame(ChessGame copy) {
@@ -132,12 +134,19 @@ public class ChessGame {
         ChessPosition end = move.getEndPosition();
         ChessPiece piece = board.getPiece(start);
         if (piece == null) {
+            System.out.print("null piece!");
             throw new InvalidMoveException("Invalid move!");
         }
         if (piece.getTeamColor() != getTeamTurn()) {
+            System.out.print("not your turn!");
             throw new InvalidMoveException("Invalid move!");
         }
         if (!validMoves(start).contains(move)) {
+            System.out.print("not one of the valid moves");
+            for (ChessMove validMove : validMoves(start)) {
+                System.out.printf("Potential move: %d,%d\n", validMove.getEndPosition().getRow(),
+                        validMove.getEndPosition().getColumn());
+            }
             throw new InvalidMoveException("Invalid move!");
         }
         if (move.getPromotionPiece() == null) {
@@ -220,6 +229,10 @@ public class ChessGame {
         }
     }
 
+    public void setIsGameOver() {
+        this.isGameOver = Boolean.TRUE;
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -268,6 +281,7 @@ public class ChessGame {
                 }
             }
         }
+        setIsGameOver();
         return true;
     }
 
@@ -294,6 +308,7 @@ public class ChessGame {
                 }
             }
         }
+        setIsGameOver();
         return true;
     }
 
@@ -318,6 +333,10 @@ public class ChessGame {
 
     public EnPassantTracker getEnPassantTracker() {
         return this.enPassantTracker;
+    }
+
+    public Boolean getGameOver() {
+        return isGameOver;
     }
 
     @Override

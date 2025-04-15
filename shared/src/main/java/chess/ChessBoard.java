@@ -130,6 +130,10 @@ public class ChessBoard {
         this.addPiece(square, piece);
     }
 
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
     @Override
     public int hashCode() {
         int code = 0;
