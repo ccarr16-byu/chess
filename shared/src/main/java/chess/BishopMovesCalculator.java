@@ -13,46 +13,8 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             return moves;
         }
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
-        for (int i = currentRow + 1, j = currentColumn + 1; i < 9 && j < 9; i++, j++) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-                }
-                break;
-            }
-        }
-        for (int i = currentRow - 1, j = currentColumn - 1; i > 0 && j > 0; i--, j--) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-                }
-                break;
-            }
-        }
-        for (int i = currentRow + 1, j = currentColumn - 1; i < 9 && j > 0; i++, j--) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-                }
-                break;
-            }
-        }
-        for (int i = currentRow - 1, j = currentColumn + 1; i > 0 && j < 9; i--, j++) {
-            if (board.getPiece(new ChessPosition(i, j)) == null) {
-                moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-            } else {
-                if (board.getPiece(new ChessPosition(i, j)).getTeamColor() != color) {
-                    moves.add(new ChessMove(position, new ChessPosition(i, j), null));
-                }
-                break;
-            }
-        }
+        var diagonalMoves = QueenMovesCalculator.getDiagonalMoves(board, position, currentRow, currentColumn, color);
+        moves.addAll(diagonalMoves);
         return moves;
     }
 }

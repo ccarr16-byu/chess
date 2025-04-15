@@ -13,7 +13,8 @@ public class ChessBoardUI {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
 
-    public static void drawChessBoard(ChessGame.TeamColor team, ChessBoard board, int method, ChessMove lastMove, ChessPosition position, Collection<ChessMove> validMoves) {
+    public static void drawChessBoard(ChessGame.TeamColor team, ChessBoard board, int method, ChessMove lastMove,
+                                      ChessPosition position, Collection<ChessMove> validMoves) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);

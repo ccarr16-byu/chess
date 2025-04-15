@@ -13,6 +13,17 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
             return moves;
         }
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
+        var horizontalMoves = getHorizontalMoves(board, position, currentRow, currentColumn, color);
+        var diagonalMoves = getDiagonalMoves(board, position, currentRow, currentColumn, color);
+        moves.addAll(horizontalMoves);
+        moves.addAll(diagonalMoves);
+        return moves;
+    }
+
+    public static List<ChessMove> getHorizontalMoves(ChessBoard board, ChessPosition position, int currentRow,
+                                                     int currentColumn,
+                                              ChessGame.TeamColor color) {
+        List<ChessMove> moves = new ArrayList<>();
         for (int i = currentRow + 1; i < 9; i++) {
             if (board.getPiece(new ChessPosition(i, currentColumn)) == null) {
                 moves.add(new ChessMove(position, new ChessPosition(i, currentColumn), null));
@@ -53,6 +64,12 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
                 break;
             }
         }
+        return moves;
+    }
+
+    public static List<ChessMove> getDiagonalMoves(ChessBoard board, ChessPosition position, int currentRow,
+                                                   int currentColumn, ChessGame.TeamColor color) {
+        List<ChessMove> moves = new ArrayList<>();
         for (int i = currentRow + 1, j = currentColumn + 1; i < 9 && j < 9; i++, j++) {
             if (board.getPiece(new ChessPosition(i, j)) == null) {
                 moves.add(new ChessMove(position, new ChessPosition(i, j), null));
